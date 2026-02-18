@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ایمان‌ای‌آی - هوش مصنوعی و حسابداری</title>
+    <style>
+        /* ==================== فونت‌های حرفه‌ای ==================== */
+        @font-face {
+            font-family: 'Vazir';
+            src: url('https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir.woff2') format('woff2');
+            font-weight: normal;
+        }
+
+        @font-face {
+            font-family: 'Vazir';
+            src: url('https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir-Bold.woff2') format('woff2');
+            font-weight: bold;
+        }
+
+        /* ==================== متغیرهای پیشرفته ==================== */
+        :root {
+            --primary: #4A90E2;
+            --primary-dark: #2171c7;
+            --primary-light: #a2c6f5;
+            --secondary: #9013FE;
+            --secondary-dark: #6b0fbd;
+            --accent: #F5A623;
+            --accent-dark: #d48c0c;
+            --success: #7ED321;
+            --danger: #D0021B;
+            --dark: #2C3E50;
+            --dark-light: #34495e;
+            --light: #F8F9FA;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-dark: linear-gradient(135deg, var(--dark), #1a252f);
+            --gradient-success: linear-gradient(135deg, var(--success), #45a049);
+            --gradient-accent: linear-gradient(135deg, var(--accent), #e67e22);
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.15);
+            --shadow-lg: 0 8px 16px rgba(0,0,0,0.2);
+            --shadow-xl: 0 12px 24px rgba(0,0,0,0.25);
+            
+            --border-radius-sm: 8px;
+            --border-radius-md: 12px;
+            --border-radius-lg: 20px;
+            --border-radius-xl: 30px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ==================== استایل پایه ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazir', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* پس‌زمینه متحرک */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ==================== هدر پیشرفته ==================== */
+        .header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius-xl);
+            padding: 15px 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 20px;
+            z-index: 1000;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        /* لوگوی حرفه‌ای */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .logo-3d {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: white;
+            box-shadow: var(--shadow-md);
+            transform: rotate(10deg);
+            transition: var(--transition);
+        }
+
+        .logo:hover .logo-3d {
+            transform: rotate(0deg) scale(1.1);
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+
+        .logo-text p {
+            color: var(--gray);
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        /* منوی پیشرفته */
+        .nav-menu {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            color: var(--dark);
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--gradient-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-link i {
+            font-size: 18px;
+        }
+
+        /* نوار پیشرفت منو */
+        .nav-indicator {
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+            transition: var(--transition);
+        }
+
+        /* ==================== محتوای اصلی ==================== */
+        .main-content {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius-xl);
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255,255,255,0.2);
+            min-height: 600px;
+        }
+
+        .page {
+            display: none;
+            animation: pageEnter 0.5s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes pageEnter {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==================== کارت‌های پیشرفته ==================== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: 30px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--gray-light);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--gradient-accent);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* ==================== دکمه‌های پیشرفته ==================== */
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--gradient-dark);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ==================== بخش قهرمان (Hero) ==================== */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(74,144,226,0.1), rgba(144,19,254,0.1));
+            border-radius: var(--border-radius-xl);
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 52px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--gray);
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* ==================== ویژگی‌ها ==================== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: var(--border-radius-lg);
+            transition: var(--transition);
+        }
+
+        .feature:hover {
+            transform: scale(1.05);
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .feature h4 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* ==================== پلن‌های قیمت‌گذاری ==================== */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: 40px 30px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            position: relative;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-15px);
+            border-color: var(--primary);
+        }
+
+        .pricing-card.popular {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-accent);
+            color: white;
+            padding: 8px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .pricing-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .pricing-name {
+            font-size: 28px;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .pricing-price {
+            font-size: 48px;
+            color: var(--primary);
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .pricing-price small {
+            font-size: 16px;
+            color: var(--gray);
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 30px 0;
+            text-align: right;
+        }
+
+        .pricing-features li {
+            margin: 15px 0;
+            padding-right: 30px;
+            position: relative;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            position: absolute;
+            right: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .pricing-features li.disabled {
+            color: var(--gray-light);
+        }
+
+        .pricing-features li.disabled::before {
+            content: '✗';
+            color: var(--danger);
+        }
+
+        /* ==================== تایم‌لاین ==================== */
+        .timeline {
+            position: relative;
+            padding: 50px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 50%;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-primary);
+            transform: translateX(50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+            width: 50%;
+            padding: 0 40px;
+        }
+
+        .timeline-item:nth-child(odd) {
+            right: 0;
+        }
+
+        .timeline-item:nth-child(even) {
+            right: 50%;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            top: 20px;
+            right: -12px;
+            width: 24px;
+            height: 24px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot {
+            right: auto;
+            left: -12px;
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ==================== فرم‌های پیشرفته ==================== */
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--gray-light);
+            border-radius: var(--border-radius-sm);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74,144,226,0.1);
+        }
+
+        .form-control.error {
+            border-color: var(--danger);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ==================== نوتیفیکیشن ==================== */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 15px 25px;
+            border-radius: var(--border-radius-sm);
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            animation: slideIn 0.3s;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .notification.success {
+            background: var(--gradient-success);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        .notification.info {
+            background: var(--gradient-primary);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ==================== مودال ==================== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: var(--border-radius-lg);
+            max-width: 500px;
+            width: 90%;
+            animation: modalEnter 0.3s;
+        }
+
+        @keyframes modalEnter {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            font-size: 30px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* ==================== فوتر پیشرفته ==================== */
+        .footer {
+            background: var(--gradient-dark);
+            color: white;
+            border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+            padding: 60px 0 20px;
+            margin-top: 60px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h4 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin: 10px 0;
+        }
+
+        .footer-col ul li a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-col ul li a:hover {
+            color: white;
+            padding-right: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background: var(--gradient-primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* ==================== لودینگ ==================== */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ==================== اسکرول به بالا ==================== */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+        }
+
+        /* ==================== انیمیشن‌ها ==================== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* ==================== ریسپانسیو ==================== */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 42px;
+            }
+            
+            .timeline::before {
+                right: 30px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                right: 0 !important;
+                padding-right: 70px;
+            }
+            
+            .timeline-dot {
+                right: 18px !important;
+                left: auto !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+            }
+            
+            .hero h1 {
+                font-size: 32px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .pricing-card.popular {
+                transform: scale(1);
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- پس‌زمینه متحرک -->
+    <div class="bg-animation" id="bgAnimation"></div>
+
+    <!-- لودینگ -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- نوتیفیکیشن -->
+    <div class="notification" id="notification" style="display: none;"></div>
+
+    <!-- مودال -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">عنوان مودال</h2>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modalBody">
+                <p>محتوای مودال اینجا قرار می‌گیرد...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- ==================== هدر ==================== -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-3d">🤖</div>
+                    <div class="logo-text">
+                        <h1>ایمان‌ای‌آی</h1>
+                        <p>IMAN AI & ACCOUNTING</p>
+                    </div>
+                </div>
+                
+                <nav class="nav-menu" id="navMenu">
+                    <div class="nav-item">
+                        <a href="#" class="nav-link active" onclick="changePage('home')">
+                            <i>🏠</i> صفحه اصلی
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link" onclick="changePage('imanai')">
+                            <i>🤖</i> ImanAI
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link" onclick="changePage('accounting')">
+                            <i>💰</i> ImanAccounting
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link" onclick="changePage('plugins')">
+                            <i>📦</i> پلاگین‌ها
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link" onclick="changePage('docs')">
+                            <i>📚</i> مستندات
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="nav-link" onclick="changePage('login')">
+                            <i>🔑</i> ورود
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <!-- ==================== محتوای اصلی ==================== -->
+        <main class="main-content">
+            <!-- صفحه اصلی -->
+            <div id="page-home" class="page active">
+                <section class="hero">
+                    <h1>حساب‌هایت رو به ایمان بسپار</h1>
+                    <p>قدرتمندترین راهکار هوش مصنوعی و حسابداری برای کسب‌وکارهای ایرانی</p>
+                    <div class="btn-group">
+                        <a href="#" class="btn btn-primary" onclick="changePage('imanai')">شروع کنید</a>
+                        <a href="#" class="btn btn-outline" onclick="openModal('demo')">درخواست دمو</a>
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">۱۰,۰۰۰+</div>
+                            <div class="stat-label">کاربر فعال</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">۵۰۰+</div>
+                            <div class="stat-label">پلاگین</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">۹۹.۹٪</div>
+                            <div class="stat-label">رضایت کاربران</div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-icon">🤖</div>
+                        <h3>ImanAI</h3>
+                        <p>کتابخانه هوش مصنوعی اختصاصی با قابلیت یادگیری عمیق</p>
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-primary" onclick="changePage('imanai')">مشاهده</a>
+                            <a href="#" class="btn btn-outline" onclick="downloadFile('imanai')">دانلود</a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">💰</div>
+                        <h3>ImanAccounting</h3>
+                        <p>اپلیکیشن حسابداری حرفه‌ای با هوش مصنوعی داخلی</p>
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-primary" onclick="changePage('accounting')">مشاهده</a>
+                            <a href="#" class="btn btn-outline" onclick="downloadFile('accounting')">دانلود</a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">📦</div>
+                        <h3>ImanPlugins</h3>
+                        <p>اکوسیستم پلاگین‌های قابل توسعه با فروشگاه اختصاصی</p>
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-primary" onclick="changePage('plugins')">مشاهده</a>
+                            <a href="#" class="btn btn-outline" onclick="openPluginStore()">فروشگاه</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature">
+                        <div class="feature-icon">🚀</div>
+                        <h4>سرعت بالا</h4>
+                        <p>بهینه‌سازی شده برای بهترین عملکرد</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🔒</div>
+                        <h4>امنیت کامل</h4>
+                        <p>رمزنگاری پیشرفته و احراز هویت</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">📱</div>
+                        <h4>کراس پلتفرم</h4>
+                        <p>قابل اجرا روی همه دستگاه‌ها</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">💎</div>
+                        <h4>رایگان</h4>
+                        <p>نسخه پایه کاملاً رایگان</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- صفحه ImanAI -->
+            <div id="page-imanai" class="page">
+                <h1 style="font-size: 36px; margin-bottom: 30px;">🤖 کتابخانه ImanAI</h1>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>📊 ویژگی‌ها</h3>
+                        <ul style="list-style: none; text-align: right;">
+                            <li>✓ Tensor اختصاصی با عملیات ریاضی</li>
+                            <li>✓ لایه‌های Dense، Dropout، BatchNorm</li>
+                            <li>✓ توابع فعال‌سازی ReLU، Sigmoid، Tanh</li>
+                            <li>✓ بهینه‌سازهای Adam، SGD، RMSprop</li>
+                            <li>✓ توابع خطای MSE، Cross-entropy</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📥 نصب سریع</h3>
+                        <pre style="background: #f4f4f4; padding: 15px; border-radius: 10px; text-align: left; direction: ltr;">pip install imanai</pre>
+                        <p style="margin: 15px 0;">یا دانلود مستقیم:</p>
+                        <a href="#" class="btn btn-primary" onclick="downloadFile('imanai')">دانلود رایگان</a>
+                    </div>
+                </div>
+
+                <div style="margin: 40px 0;">
+                    <h3 style="margin-bottom: 20px;">📝 نمونه کد</h3>
+                    <pre style="background: #2C3E50; color: #fff; padding: 20px; border-radius: 10px; text-align: left; direction: ltr; overflow-x: auto;">
+from ImanAILight import Sequential, Dense
+
+# ساخت مدل
+model = Sequential(name="my_model")
+model.add(Dense(input_dim=10, output_dim=32, activation="relu"))
+model.add(Dense(input_dim=32, output_dim=1, activation="sigmoid"))
+
+# کامپایل و آموزش
+model.compile(optimizer="adam", loss="binary_crossentropy")
+model.fit(X_train, y_train, epochs=100, batch_size=32)
+
+# پیش‌بینی
+result = model.predict(X_test)
+                    </pre>
+                </div>
+            </div>
+
+            <!-- صفحه ImanAccounting -->
+            <div id="page-accounting" class="page">
+                <h1 style="font-size: 36px; margin-bottom: 30px;">💰 ImanAccounting</h1>
+                
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <div class="pricing-icon">🔓</div>
+                        <div class="pricing-name">رایگان</div>
+                        <div class="pricing-price">۰ <small>تومان</small></div>
+                        <ul class="pricing-features">
+                            <li>ثبت تراکنش نامحدود</li>
+                            <li>مدیریت ۱۰ حساب</li>
+                            <li>گزارش‌گیری پایه</li>
+                            <li>پشتیبانی ایمیل</li>
+                            <li class="disabled">هوش مصنوعی</li>
+                            <li class="disabled">پلاگین‌ها</li>
+                        </ul>
+                        <a href="#" class="btn btn-outline" onclick="downloadFile('accounting-free')">دانلود رایگان</a>
+                    </div>
+                    
+                    <div class="pricing-card popular">
+                        <div class="popular-badge">محبوبترین</div>
+                        <div class="pricing-icon">💎</div>
+                        <div class="pricing-name">حرفه‌ای</div>
+                        <div class="pricing-price">۵۰۰ <small>هزار تومان/سال</small></div>
+                        <ul class="pricing-features">
+                            <li>همه امکانات رایگان</li>
+                            <li>مدیریت حساب نامحدود</li>
+                            <li>هوش مصنوعی داخلی</li>
+                            <li>پیش‌بینی هزینه‌ها</li>
+                            <li>دسترسی به پلاگین‌ها</li>
+                            <li>پشتیبانی VIP</li>
+                        </ul>
+                        <a href="#" class="btn btn-primary" onclick="openModal('buy-pro')">خرید لایسنس</a>
+                    </div>
+                    
+                    <div class="pricing-card">
+                        <div class="pricing-icon">🏢</div>
+                        <div class="pricing-name">سازمانی</div>
+                        <div class="pricing-price">۲ <small>میلیون تومان/سال</small></div>
+                        <ul class="pricing-features">
+                            <li>همه امکانات حرفه‌ای</li>
+                            <li>کاربران نامحدود</li>
+                            <li>نصب روی سرور</li>
+                            <li>API اختصاصی</li>
+                            <li>پشتیبانی ۲۴/۷</li>
+                            <li>گارانتی بازگشت وجه</li>
+                        </ul>
+                        <a href="#" class="btn btn-outline" onclick="openModal('contact')">تماس بگیرید</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- صفحه پلاگین‌ها -->
+            <div id="page-plugins" class="page">
+                <h1 style="font-size: 36px; margin-bottom: 30px;">📦 فروشگاه پلاگین‌ها</h1>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <span class="card-badge">رایگان</span>
+                        <div class="card-icon">📊</div>
+                        <h3>گزارش‌گیر پیشرفته</h3>
+                        <p>ایجاد نمودارها و گزارشات تعاملی با قابلیت خروجی PDF</p>
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-primary" onclick="installPlugin('report')">نصب</a>
+                            <a href="#" class="btn btn-outline" onclick="openModal('report-info')">اطلاعات</a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <span class="card-badge">۵۰,۰۰۰ تومان</span>
+                        <div class="card-icon">📎</div>
+                        <h3>اکسل پرو</h3>
+                        <p>تبدیل اطلاعات به اکسل و بالعکس با قالب‌بندی پیشرفته</p>
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-primary" onclick="buyPlugin('excel')">خرید</a>
+                            <a href="#" class="btn btn-outline" onclick="openModal('excel-info')">اطلاعات</a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <span class="card-badge">۳۰,۰۰۰ تومان</span>
+                        <div class="card-icon">📧</div>
+                        <h3>ارسال خودکار ایمیل</h3>
+                        <p>ارسال گزارشات دوره‌ای به ایمیل با قابلیت شخصی‌سازی</p>
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-primary" onclick="buyPlugin('email')">خرید</a>
+                            <a href="#" class="btn btn-outline" onclick="openModal('email-info')">اطلاعات</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 50px; border-radius: 20px; margin-top: 40px;">
+                    <h2 style="font-size: 28px; margin-bottom: 20px;">🛠️ توسعه‌دهنده پلاگین شو!</h2>
+                    <p style="font-size: 18px; margin-bottom: 30px;">شما هم می‌توانید پلاگین خود را بسازید و در فروشگاه ایمان بفروشید. تا ۷۰٪ سود برای شما!</p>
+                    <div class="btn-group">
+                        <a href="#" class="btn btn-primary" onclick="openModal('dev-guide')">مستندات توسعه</a>
+                        <a href="#" class="btn btn-outline" style="background: white; color: var(--primary);" onclick="openModal('dev-register')">ثبت‌نام توسعه‌دهنده</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- صفحه مستندات -->
+            <div id="page-docs" class="page">
+                <h1 style="font-size: 36px; margin-bottom: 30px;">📚 مرکز مستندات</h1>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-icon">🚀</div>
+                        <h3>شروع سریع</h3>
+                        <p>آموزش نصب و راه‌اندازی در ۵ دقیقه</p>
+                        <a href="#" class="btn btn-primary" onclick="openModal('quick-start')">مشاهده</a>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">📘</div>
+                        <h3>راهنمای کاربر</h3>
+                        <p>آموزش کامل استفاده از نرم‌افزار</p>
+                        <a href="#" class="btn btn-primary" onclick="openModal('user-guide')">مشاهده</a>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">🔧</div>
+                        <h3>API Reference</h3>
+                        <p>مستندات فنی برای توسعه‌دهندگان</p>
+                        <a href="#" class="btn btn-primary" onclick="openModal('api-ref')">مشاهده</a>
+                    </div>
+                </div>
+
+                <div class="features-grid" style="margin-top: 30px;">
+                    <div class="feature" onclick="openModal('video-1')">
+                        <div class="feature-icon">🎥</div>
+                        <h4>آموزش نصب</h4>
+                    </div>
+                    <div class="feature" onclick="openModal('video-2')">
+                        <div class="feature-icon">🎥</div>
+                        <h4>آموزش ثبت تراکنش</h4>
+                    </div>
+                    <div class="feature" onclick="openModal('video-3')">
+                        <div class="feature-icon">🎥</div>
+                        <h4>آموزش ساخت پلاگین</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- صفحه ورود -->
+            <div id="page-login" class="page">
+                <div class="form-container">
+                    <h2 style="text-align: center; margin-bottom: 30px;">🔐 ورود به حساب کاربری</h2>
+                    
+                    <form id="loginForm" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label class="form-label">ایمیل:</label>
+                            <input type="email" class="form-control" id="email" placeholder="info@imanai.ir" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">رمز عبور:</label>
+                            <input type="password" class="form-control" id="password" placeholder="********" required>
+                        </div>
+                        
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="remember">
+                            <label for="remember">مرا به خاطر بسپار</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">ورود</button>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <a href="#" onclick="openModal('forgot-password')" style="color: var(--primary);">رمز عبور را فراموش کرده‌اید؟</a>
+                        <br>
+                        <a href="#" onclick="openModal('register')" style="color: var(--primary);">ثبت‌نام کنید</a>
+                    </div>
+
+                    <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%); border-radius: 10px;">
+                        <h4 style="margin-bottom: 15px;">⚡ فعال‌سازی سریع لایسنس</h4>
+                        <div class="form-group">
+                            <label class="form-label">HWID شما:</label>
+                            <input type="text" class="form-control" id="hwid" value="ABC123XYZ789" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">کلید لایسنس:</label>
+                            <input type="text" class="form-control" id="license-key" placeholder="XXXX-XXXX-XXXX">
+                        </div>
+                        <button class="btn btn-success" style="width: 100%;" onclick="activateLicense()">✅ فعال‌سازی لایسنس</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- ==================== فوتر ==================== -->
+        <footer class="footer">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>درباره ایمان‌ای‌آی</h4>
+                    <p>ایمان‌ای‌آی یک برند ایرانی در زمینه هوش مصنوعی و نرم‌افزارهای حسابداری است که با هدف سادگی و کارایی ساخته شده.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">📘</a>
+                        <a href="#" class="social-link">🐦</a>
+                        <a href="#" class="social-link">📷</a>
+                        <a href="#" class="social-link">💬</a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>دسترسی سریع</h4>
+                    <ul>
+                        <li><a href="#" onclick="changePage('home')">🏠 صفحه اصلی</a></li>
+                        <li><a href="#" onclick="changePage('imanai')">🤖 ImanAI</a></li>
+                        <li><a href="#" onclick="changePage('accounting')">💰 ImanAccounting</a></li>
+                        <li><a href="#" onclick="changePage('plugins')">📦 پلاگین‌ها</a></li>
+                        <li><a href="#" onclick="changePage('docs')">📚 مستندات</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>پشتیبانی</h4>
+                    <ul>
+                        <li><a href="#" onclick="openModal('faq')">❓ سوالات متداول</a></li>
+                        <li><a href="#" onclick="openModal('contact')">📞 تماس با ما</a></li>
+                        <li><a href="#" onclick="openModal('terms')">📜 شرایط استفاده</a></li>
+                        <li><a href="#" onclick="openModal('privacy')">🔒 حریم خصوصی</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>تماس با ما</h4>
+                    <ul>
+                        <li>📧 info@imanai.ir</li>
+                        <li>📱 @ImanAI</li>
+                        <li>🌐 imanai.ir</li>
+                        <li>📞 ۰۲۱-۱۲۳۴۵۶۷۸</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                © ۲۰۲۶ ایمان‌ای‌آی - تمام حقوق محفوظ است. طراحی شده با ❤️ توسط ایمان
+            </div>
+        </footer>
+    </div>
+
+    <!-- دکمه اسکرول به بالا -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()">↑</div>
+
+    <script>
+        // ==================== متغیرهای سراسری ====================
+        let currentPage = 'home';
+        let notificationTimeout;
+
+        // ==================== تغییر صفحه ====================
+        function changePage(page) {
+            // نمایش لودینگ
+            showLoading();
+            
+            setTimeout(() => {
+                // مخفی کردن همه صفحات
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                
+                // نمایش صفحه جدید
+                document.getElementById(`page-${page}`).classList.add('active');
+                
+                // آپدیت منو
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                document.querySelector(`[onclick="changePage('${page}')"]`).classList.add('active');
+                
+                // تغییر عنوان
+                const titles = {
+                    'home': 'صفحه اصلی',
+                    'imanai': 'ImanAI',
+                    'accounting': 'ImanAccounting',
+                    'plugins': 'پلاگین‌ها',
+                    'docs': 'مستندات',
+                    'login': 'ورود'
+                };
+                document.title = `ایمان‌ای‌آی - ${titles[page]}`;
+                
+                // ذخیره در localStorage
+                localStorage.setItem('lastPage', page);
+                currentPage = page;
+                
+                // اسکرول به بالا
+                scrollToTop();
+                
+                // مخفی کردن لودینگ
+                hideLoading();
+            }, 300);
+        }
+
+        // ==================== نمایش نوتیفیکیشن ====================
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.style.display = 'block';
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            if (notificationTimeout) {
+                clearTimeout(notificationTimeout);
+            }
+            
+            notificationTimeout = setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // ==================== لودینگ ====================
+        function showLoading() {
+            document.getElementById('loading').classList.add('active');
+        }
+
+        function hideLoading() {
+            setTimeout(() => {
+                document.getElementById('loading').classList.remove('active');
+            }, 500);
+        }
+
+        // ==================== مودال ====================
+        function openModal(type) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            const contents = {
+                'demo': {
+                    title: 'درخواست دمو',
+                    body: '<p>برای دریافت دموی رایگان، اطلاعات زیر را وارد کنید:</p><input type="text" class="form-control" placeholder="نام و نام خانوادگی" style="margin:10px 0"><input type="email" class="form-control" placeholder="ایمیل"><button class="btn btn-primary" style="margin-top:20px;width:100%" onclick="closeModal();showNotification(\'درخواست شما ثبت شد\',\'success\')">ارسال درخواست</button>'
+                },
+                'buy-pro': {
+                    title: 'خرید لایسنس حرفه‌ای',
+                    body: '<p>لطفاً اطلاعات زیر را تکمیل کنید:</p><input type="text" class="form-control" placeholder="نام شرکت" style="margin:10px 0"><input type="email" class="form-control" placeholder="ایمیل"><input type="text" class="form-control" placeholder="شماره تماس"><button class="btn btn-primary" style="margin-top:20px;width:100%" onclick="closeModal();showNotification(\'به زودی با شما تماس می‌گیریم\',\'success\')">پرداخت</button>'
+                },
+                'contact': {
+                    title: 'تماس با ما',
+                    body: '<p>📧 info@imanai.ir<br>📱 @ImanAI<br>📞 ۰۲۱-۱۲۳۴۵۶۷۸</p>'
+                }
+            };
+            
+            if (contents[type]) {
+                title.textContent = contents[type].title;
+                body.innerHTML = contents[type].body;
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // ==================== مدیریت فرم لاگین ====================
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            showLoading();
+            
+            setTimeout(() => {
+                hideLoading();
+                if (email && password) {
+                    showNotification('ورود موفقیت‌آمیز بود!', 'success');
+                } else {
+                    showNotification('لطفاً همه فیلدها را پر کنید', 'error');
+                }
+            }, 1000);
+        }
+
+        // ==================== فعال‌سازی لایسنس ====================
+        function activateLicense() {
+            const licenseKey = document.getElementById('license-key').value;
+            
+            if (!licenseKey) {
+                showNotification('لطفاً کلید لایسنس را وارد کنید', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            setTimeout(() => {
+                hideLoading();
+                showNotification('✅ لایسنس با موفقیت فعال شد', 'success');
+            }, 1500);
+        }
+
+        // ==================== دانلود فایل ====================
+        function downloadFile(type) {
+            showNotification(`دانلود ${type} شروع شد`, 'info');
+        }
+
+        // ==================== نصب پلاگین ====================
+        function installPlugin(plugin) {
+            showNotification(`پلاگین ${plugin} با موفقیت نصب شد`, 'success');
+        }
+
+        // ==================== خرید پلاگین ====================
+        function buyPlugin(plugin) {
+            openModal('buy-pro');
+        }
+
+        // ==================== باز کردن فروشگاه پلاگین ====================
+        function openPluginStore() {
+            changePage('plugins');
+            showNotification('به فروشگاه پلاگین‌ها خوش آمدید', 'info');
+        }
+
+        // ==================== اسکرول به بالا ====================
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // ==================== نمایش/مخفی کردن دکمه اسکرول ====================
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.getElementById('scrollTop');
+            if (window.scrollY > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        // ==================== ایجاد پس‌زمینه متحرک ====================
+        function createBackground() {
+            const bg = document.getElementById('bgAnimation');
+            for (let i = 0; i < 20; i++) {
+                const circle = document.createElement('div');
+                circle.className = 'bg-circle';
+                const size = Math.random() * 200 + 50;
+                circle.style.width = size + 'px';
+                circle.style.height = size + 'px';
+                circle.style.left = Math.random() * 100 + '%';
+                circle.style.top = Math.random() * 100 + '%';
+                circle.style.animationDelay = Math.random() * 10 + 's';
+                circle.style.animationDuration = Math.random() * 10 + 10 + 's';
+                bg.appendChild(circle);
+            }
+        }
+
+        // ==================== بارگذاری اولیه ====================
+        window.onload = function() {
+            createBackground();
+            
+            // بازیابی آخرین صفحه
+            const lastPage = localStorage.getItem('lastPage');
+            if (lastPage) {
+                changePage(lastPage);
+            }
+            
+            // خوش‌آمدگویی
+            setTimeout(() => {
+                showNotification('به ایمان‌ای‌آی خوش آمدید!', 'success');
+            }, 500);
+        };
+
+        // ==================== بستن مودال با کلیک خارج ====================
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>
