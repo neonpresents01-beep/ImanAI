@@ -1,0 +1,32 @@
+name: Build ImanAccounting EXE
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install requirements
+        run: |
+          pip install pyinstaller pyqt5 pyqt5-tools pyqtchart pycryptodome requests
+      
+      - name: Build EXE
+        run: |
+          pyinstaller --onefile --windowed --name="ImanAccounting" Latestversion3.py
+      
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: ImanAccounting
+          path: dist/ImanAccounting.exe
