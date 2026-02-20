@@ -3,12 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- سئو و متا تگ‌ها -->
-    <title>ایمان‌ای‌آی - ImanAI | هوش مصنوعی و حسابداری ایرانی</title>
-    <meta name="description" content="ایمان‌ای‌آی: اولین پلتفرم یکپارچه هوش مصنوعی و حسابداری در ایران">
-    <meta name="keywords" content="هوش مصنوعی, حسابداری, ImanAI, ایمان, پلاگین">
-    <meta name="author" content="ایمان">
+    <title>ایمان‌ای‌آی - ImanAI | هوش مصنوعی و حسابداری</title>
+    <meta name="description" content="ایمان‌ای‌آی: پلتفرم یکپارچه هوش مصنوعی و حسابداری">
     
     <style>
         /* ==================== فونت وزیر ==================== */
@@ -24,16 +20,15 @@
             font-weight: bold;
         }
 
-        /* ==================== متغیرهای رنگ ==================== */
+        /* ==================== متغیرها ==================== */
         :root {
             --primary: #4A90E2;
             --secondary: #9013FE;
             --accent: #F5A623;
-            --success: #7ED321;
+            --success: #27ae60;
             --danger: #D0021B;
             --dark: #2C3E50;
             --light: #F8F9FA;
-            --gray: #6c757d;
             
             --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
             --gradient-dark: linear-gradient(135deg, var(--dark), #1a252f);
@@ -47,7 +42,6 @@
             --transition: all 0.3s ease;
         }
 
-        /* ==================== استایل پایه ==================== */
         * {
             margin: 0;
             padding: 0;
@@ -59,7 +53,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: var(--dark);
             line-height: 1.6;
-            min-height: 100vh;
         }
 
         .container {
@@ -93,6 +86,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            cursor: pointer;
         }
 
         .logo-3d {
@@ -105,10 +99,8 @@
             justify-content: center;
             font-size: 30px;
             color: white;
-            box-shadow: var(--shadow-lg);
             transform: rotate(10deg);
             transition: var(--transition);
-            cursor: pointer;
         }
 
         .logo:hover .logo-3d {
@@ -120,7 +112,6 @@
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            cursor: pointer;
         }
 
         /* ==================== منو ==================== */
@@ -137,10 +128,10 @@
             border-radius: 50px;
             transition: var(--transition);
             cursor: pointer;
-            font-size: 14px;
             background: transparent;
             border: none;
             font-family: 'Vazir', sans-serif;
+            font-size: 14px;
         }
 
         .nav-link:hover, .nav-link.active {
@@ -148,7 +139,7 @@
             color: white;
         }
 
-        /* ==================== محتوای اصلی ==================== */
+        /* ==================== محتوا ==================== */
         .main-content {
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
@@ -211,14 +202,13 @@
             display: inline-block;
             padding: 10px 25px;
             border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: var(--transition);
             border: none;
             cursor: pointer;
             font-size: 14px;
             font-family: 'Vazir', sans-serif;
             margin: 5px;
+            transition: var(--transition);
+            text-decoration: none;
         }
 
         .btn-primary {
@@ -240,6 +230,12 @@
         .btn-success {
             background: var(--success);
             color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         /* ==================== بخش قهرمان ==================== */
@@ -270,18 +266,14 @@
         .pricing-card {
             background: white;
             border-radius: var(--border-radius-lg);
-            padding: 30px 20px;
+            padding: 30px;
             box-shadow: var(--shadow-lg);
             text-align: center;
-            transition: var(--transition);
-        }
-
-        .pricing-card:hover {
-            transform: translateY(-10px);
         }
 
         .pricing-card.popular {
             border: 2px solid var(--accent);
+            transform: scale(1.05);
         }
 
         .popular-badge {
@@ -300,9 +292,9 @@
             margin: 15px 0;
         }
 
-        /* ==================== فرم‌ها ==================== */
+        /* ==================== فرم ==================== */
         .form-container {
-            max-width: 450px;
+            max-width: 500px;
             margin: 0 auto;
             background: white;
             padding: 30px;
@@ -312,17 +304,11 @@
 
         .form-control {
             width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: 'Vazir', sans-serif;
+            padding: 10px;
             margin: 10px 0;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-family: 'Vazir', sans-serif;
         }
 
         /* ==================== نوتیفیکیشن ==================== */
@@ -340,54 +326,6 @@
         .notification.success { background: var(--success); }
         .notification.error { background: var(--danger); }
         .notification.info { background: var(--primary); }
-
-        /* ==================== فوتر ==================== */
-        .footer {
-            background: var(--gradient-dark);
-            color: white;
-            border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
-            padding: 50px 0 20px;
-            margin-top: 50px;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            margin-bottom: 30px;
-            padding: 0 40px;
-        }
-
-        .footer-col h4 {
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-
-        .footer-col ul {
-            list-style: none;
-        }
-
-        .footer-col ul li {
-            margin: 8px 0;
-        }
-
-        .footer-col ul li a {
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .footer-col ul li a:hover {
-            color: white;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            font-size: 13px;
-        }
 
         /* ==================== FAQ ==================== */
         .faq-item {
@@ -413,19 +351,53 @@
             display: block;
         }
 
-        /* ==================== ریسپانسیو ==================== */
+        /* ==================== فوتر ==================== */
+        .footer {
+            background: var(--gradient-dark);
+            color: white;
+            border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+            padding: 50px 0 20px;
+            margin-top: 50px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            padding: 0 40px;
+        }
+
+        .footer-col h4 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 30px;
+        }
+
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
-                text-align: center;
             }
-            
-            .hero h1 {
-                font-size: 28px;
-            }
-            
             .nav-menu {
                 justify-content: center;
+            }
+            .pricing-card.popular {
+                transform: scale(1);
             }
         }
     </style>
@@ -448,7 +420,7 @@
                 <nav class="nav-menu">
                     <button class="nav-link active" onclick="changePage('home')">🏠 صفحه اصلی</button>
                     <button class="nav-link" onclick="changePage('imanai')">🤖 ImanAI</button>
-                    <button class="nav-link" onclick="changePage('accounting')">💰 ImanAccounting</button>
+                    <button class="nav-link" onclick="changePage('accounting')">💰 حسابداری</button>
                     <button class="nav-link" onclick="changePage('plugins')">📦 پلاگین‌ها</button>
                     <button class="nav-link" onclick="changePage('docs')">📚 مستندات</button>
                     <button class="nav-link" onclick="changePage('faq')">❓ سوالات</button>
@@ -477,7 +449,6 @@
                         <p>کتابخانه هوش مصنوعی اختصاصی با قابلیت یادگیری عمیق</p>
                         <div>
                             <button class="btn btn-primary" onclick="changePage('imanai')">مشاهده</button>
-                            <button class="btn btn-outline" onclick="showNotification('دانلود ImanAI شروع شد', 'info')">دانلود</button>
                         </div>
                     </div>
                     
@@ -487,7 +458,6 @@
                         <p>نرم‌افزار حسابداری هوشمند با قابلیت ثبت تراکنش</p>
                         <div>
                             <button class="btn btn-primary" onclick="changePage('accounting')">مشاهده</button>
-                            <button class="btn btn-outline" onclick="showNotification('دانلود ImanAccounting شروع شد', 'info')">دانلود</button>
                         </div>
                     </div>
                     
@@ -497,7 +467,6 @@
                         <p>فروشگاه پلاگین‌های قابل توسعه</p>
                         <div>
                             <button class="btn btn-primary" onclick="changePage('plugins')">مشاهده</button>
-                            <button class="btn btn-outline" onclick="showNotification('ابزار ساخت پلاگین', 'info')">ساخت پلاگین</button>
                         </div>
                     </div>
                 </div>
@@ -526,12 +495,11 @@
                     <div class="card">
                         <h3>📥 نصب</h3>
                         <pre style="background: #f4f4f4; padding: 15px; border-radius: 8px; text-align: left;">pip install imanai</pre>
-                        <button class="btn btn-primary" style="margin-top: 15px;" onclick="showNotification('دانلود ImanAI شروع شد', 'success')">دانلود رایگان</button>
                     </div>
                 </div>
             </div>
 
-            <!-- صفحه ImanAccounting -->
+            <!-- صفحه حسابداری -->
             <div id="page-accounting" class="page">
                 <h1 style="font-size: 32px; margin-bottom: 25px;">💰 ImanAccounting</h1>
                 
@@ -545,7 +513,6 @@
                             <li>✓ مدیریت ۱۰ حساب</li>
                             <li>✗ هوش مصنوعی</li>
                         </ul>
-                        <button class="btn btn-outline" onclick="showNotification('دانلود نسخه رایگان شروع شد', 'info')">دانلود</button>
                     </div>
                     
                     <div class="pricing-card popular">
@@ -558,28 +525,51 @@
                             <li>✓ حساب نامحدود</li>
                             <li>✓ هوش مصنوعی داخلی</li>
                         </ul>
-                        <button class="btn btn-primary" onclick="showNotification('در حال انتقال به درگاه پرداخت', 'success')">خرید</button>
                     </div>
                 </div>
             </div>
 
-            <!-- صفحه پلاگین‌ها -->
+            <!-- صفحه پلاگین‌ها (با دکمه دانلود پلاگین تسهیم) -->
             <div id="page-plugins" class="page">
                 <h1 style="font-size: 32px; margin-bottom: 25px;">📦 فروشگاه پلاگین‌ها</h1>
                 
                 <div class="card-grid">
+                    <!-- پلاگین تسهیم (جدید) -->
+                    <div class="card" style="border: 2px solid #27ae60;">
+                        <span class="card-badge" style="background: #27ae60;">جدید</span>
+                        <div class="card-icon" style="background: #27ae60;">🧮</div>
+                        <h3>پلاگین تسهیم</h3>
+                        <p>محاسبه تسهیم سود و زیان بین شرکا - مخصوص هنرستان‌های حسابداری</p>
+                        <div style="background: #f0f8f0; padding: 10px; border-radius: 8px; margin: 15px 0;">
+                            <p style="margin: 5px 0;">✅ محاسبه خودکار سهم هر شریک</p>
+                            <p style="margin: 5px 0;">✅ قابلیت تعریف تا ۱۰ شریک</p>
+                            <p style="margin: 5px 0;">✅ گزارش‌گیری لحظه‌ای</p>
+                        </div>
+                        <a href="https://github.com/neonpresents01-beep/ImanAI/raw/main/plugins/tahsim.py" 
+                           class="btn btn-success" 
+                           download="tahsim.py"
+                           style="display: inline-block; padding: 12px 30px; background: #27ae60; color: white; text-decoration: none; border-radius: 50px; font-weight: bold; width: 100%; text-align: center;">
+                           📥 دانلود رایگان
+                        </a>
+                        <p style="margin-top: 10px; font-size: 12px; color: #7f8c8d;">حجم: ۱۵ کیلوبایت</p>
+                    </div>
+
+                    <!-- پلاگین گزارش‌گیر -->
                     <div class="card">
+                        <span class="card-badge">رایگان</span>
                         <div class="card-icon">📊</div>
                         <h3>گزارش‌گیر پیشرفته</h3>
                         <p>ایجاد نمودارهای تعاملی</p>
-                        <button class="btn btn-primary" onclick="showNotification('پلاگین نصب شد', 'success')">نصب رایگان</button>
+                        <button class="btn btn-primary" onclick="showNotification('پلاگین گزارش‌گیر نصب شد', 'success')">نصب</button>
                     </div>
                     
+                    <!-- پلاگین اکسل پرو -->
                     <div class="card">
+                        <span class="card-badge">۵۰,۰۰۰ تومان</span>
                         <div class="card-icon">📎</div>
                         <h3>اکسل پرو</h3>
                         <p>تبدیل به اکسل</p>
-                        <button class="btn btn-primary" onclick="showNotification('در حال خرید', 'info')">۵۰,۰۰۰ تومان</button>
+                        <button class="btn btn-primary" onclick="showNotification('درگاه پرداخت', 'info')">خرید</button>
                     </div>
                 </div>
             </div>
@@ -592,13 +582,13 @@
                     <div class="card">
                         <h3>🚀 شروع سریع</h3>
                         <p>آموزش نصب در ۵ دقیقه</p>
-                        <button class="btn btn-primary" onclick="showNotification('مستندات باز شد', 'info')">مشاهده</button>
+                        <button class="btn btn-primary" onclick="showNotification('مستندات', 'info')">مشاهده</button>
                     </div>
                     
                     <div class="card">
                         <h3>📘 راهنمای کاربر</h3>
                         <p>آموزش کامل نرم‌افزار</p>
-                        <button class="btn btn-primary" onclick="showNotification('مستندات باز شد', 'info')">مشاهده</button>
+                        <button class="btn btn-primary" onclick="showNotification('مستندات', 'info')">مشاهده</button>
                     </div>
                 </div>
             </div>
@@ -628,12 +618,6 @@
                         <input type="password" class="form-control" placeholder="رمز عبور" required>
                         <button type="submit" class="btn btn-primary" style="width: 100%;">ورود</button>
                     </form>
-
-                    <div style="margin-top: 25px;">
-                        <h4>⚡ فعال‌سازی لایسنس</h4>
-                        <input type="text" class="form-control" placeholder="کلید لایسنس">
-                        <button class="btn btn-success" style="width: 100%; margin-top: 10px;" onclick="showNotification('لایسنس فعال شد', 'success')">فعال‌سازی</button>
-                    </div>
                 </div>
             </div>
         </main>
@@ -671,57 +655,29 @@
     </div>
 
     <script>
-        // ==================== تغییر صفحه ====================
+        // تغییر صفحه
         function changePage(page) {
-            // مخفی کردن همه صفحات
-            document.querySelectorAll('.page').forEach(p => {
-                p.classList.remove('active');
-            });
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`page-${page}`).classList.add('active');
             
-            // نمایش صفحه انتخاب شده
-            const selectedPage = document.getElementById(`page-${page}`);
-            if(selectedPage) {
-                selectedPage.classList.add('active');
-            }
-            
-            // آپدیت کلاس active در منو
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            // پیدا کردن دکمه مربوطه و فعال کردنش
-            document.querySelectorAll('.nav-link').forEach(link => {
-                if(link.getAttribute('onclick') && link.getAttribute('onclick').includes(`'${page}'`)) {
-                    link.classList.add('active');
-                }
-            });
-            
-            // اسکرول به بالا
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.querySelector(`[onclick="changePage('${page}')"]`).classList.add('active');
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        // ==================== نوتیفیکیشن ====================
+        // نوتیفیکیشن
         function showNotification(message, type = 'info') {
             const notif = document.getElementById('notification');
             notif.style.display = 'block';
             notif.className = `notification ${type}`;
             notif.textContent = message;
-            
-            setTimeout(() => {
-                notif.style.display = 'none';
-            }, 3000);
+            setTimeout(() => notif.style.display = 'none', 3000);
         }
 
-        // ==================== اطمینان از کارکرد منو در صفحه اصلی ====================
+        // صفحه پیش‌فرض
         window.onload = function() {
-            // اطمینان از اینکه صفحه اصلی فعال است
             changePage('home');
-            
-            // تست نوتیفیکیشن
-            setTimeout(() => {
-                showNotification('به ایمان‌ای‌آی خوش آمدید!', 'success');
-            }, 500);
         };
     </script>
 </body>
-</html>
+    </html>
