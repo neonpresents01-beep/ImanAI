@@ -454,14 +454,39 @@ class LicenseManager:
 class DatabaseManager:
     """مدیریت پایگاه داده"""
     
+    # بخش دیتابیس رو اصلاح می‌کنیم
+class DatabaseManager:
     def __init__(self, db_path: str = "iman_accounting.db"):
         self.db_path = db_path
-        self.accounts = []  # کش در حافظه
-        self.transactions = []  # کش در حافظه
+        self.accounts = []
+        self.transactions = []
         self.init_database()
         self.load_data()
-        print(f"📊 {len(self.accounts)} حساب بارگذاری شد")
+        print(f"📊 {len(self.accounts)} حساب بارگذاری شد")  # برای دیباگ
     
+    def get_all_accounts(self) -> List[Account]:
+        """دریافت همه حساب‌های فعال"""
+        # اگه لیست خالی بود، دوباره از دیتابیس بخون
+        if not self.accounts:
+            self.refresh_accounts()
+        return self.accounts
+    
+    def refresh_accounts(self):
+        """بروزرسانی لیست حساب‌ها از دیتابیس"""
+        try:
+            accounts_data = self.execute_query("SELECT * FROM accounts WHERE is_active = 1 ORDER BY code")
+            self.accounts = []
+            for acc in accounts_data:
+                account = Account(acc[1], acc[2], acc[3])
+                account.id = acc[0]
+                account.balance = acc[4] if acc[4] is not None else 0.0
+                account.parent_id = acc[5]
+                self.accounts.append(account)
+            print(f"🔄 {len(self.accounts)} حساب بروزرسانی شد")
+            return True
+        except Exception as e:
+            print(f"❌ خطا در بروزرسانی حساب‌ها: {e}")
+            return False
     def get_connection(self):
         return sqlite3.connect(self.db_path)
     
@@ -1257,43 +1282,59 @@ class TransactionDialog(QDialog):
         self.setLayout(layout)
     
     def load_accounts(self):
-        """بارگذاری لیست حساب‌ها"""
-        try:
-            # بروزرسانی لیست حساب‌ها از دیتابیس
-            self.db.refresh_accounts()
+    """بارگذاری لیست حساب‌ها"""
+    try:
+        # بروزرسانی لیست حساب‌ها از دیتابیس
+        self.db.refresh_accounts()
+        accounts = self.db.get_all_accounts()
+        
+        print(f"🔄 بارگذاری {len(accounts)} حساب در دیالوگ تراکنش")
+        
+        # پاک کردن کامبوها
+        if self.debit_combo:
+            self.debit_combo.clear()
+        if self.credit_combo:
+            self.credit_combo.clear()
+        
+        if len(accounts) == 0:
+            print("⚠️ هیچ حسابی یافت نشد!")
+            # ایجاد حساب‌های پیش‌فرض
+            self.create_default_accounts()
             accounts = self.db.get_all_accounts()
-            
-            print(f"🔄 بارگذاری {len(accounts)} حساب در دیالوگ تراکنش")
-            
-            # پاک کردن کامبوها
-            if self.debit_combo:
-                self.debit_combo.clear()
-            if self.credit_combo:
-                self.credit_combo.clear()
-            
-            if len(accounts) == 0:
-                print("⚠️ هیچ حسابی یافت نشد!")
+        
+        # اضافه کردن آیتم‌ها
+        for acc in accounts:
+            if acc.is_active:
+                text = f"{acc.code} - {acc.name}"
                 if self.debit_combo:
-                    self.debit_combo.addItem("❌ حسابی وجود ندارد", None)
+                    self.debit_combo.addItem(text, acc.id)
                 if self.credit_combo:
-                    self.credit_combo.addItem("❌ حسابی وجود ندارد", None)
-                return
-            
-            # اضافه کردن آیتم‌ها
-            for acc in accounts:
-                if acc.is_active:
-                    text = f"{acc.code} - {acc.name}"
-                    if self.debit_combo:
-                        self.debit_combo.addItem(text, acc.id)
-                    if self.credit_combo:
-                        self.credit_combo.addItem(text, acc.id)
-            
-            print(f"✅ {len(accounts)} حساب با موفقیت بارگذاری شد")
-            
-        except Exception as e:
-            print(f"❌ خطا در بارگذاری حساب‌ها: {e}")
-            import traceback
-            traceback.print_exc()
+                    self.credit_combo.addItem(text, acc.id)
+        
+        print(f"✅ {len(accounts)} حساب با موفقیت بارگذاری شد")
+        
+    except Exception as e:
+        print(f"❌ خطا در بارگذاری حساب‌ها: {e}")
+        import traceback
+        traceback.print_exc()
+
+def create_default_accounts(self):
+    """ایجاد حساب‌های پیش‌فرض"""
+    default_accounts = [
+        ('1001', 'وجه نقد', 'asset'),
+        ('1002', 'بانک', 'asset'),
+        ('1101', 'حساب‌های دریافتنی', 'asset'),
+        ('2001', 'حساب‌های پرداختنی', 'liability'),
+        ('3001', 'سرمایه', 'equity'),
+        ('4001', 'فروش', 'revenue'),
+        ('5001', 'هزینه‌ها', 'expense'),
+    ]
+    
+    for code, name, type_ in default_accounts:
+        account = Account(code, name, type_)
+        self.db.add_account(account)
+    
+    print(f"✅ {len(default_accounts)} حساب پیش‌فرض ایجاد شد")
     
     def save_transaction(self):
         """ذخیره تراکنش"""
