@@ -1,0 +1,162 @@
+name: Build ImanAccounting with Icon
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'نسخه برنامه'
+        required: false
+        default: '7.1.0'
+
+jobs:
+  build-windows:
+    name: 🏗️ ساخت EXE ویندوز با آیکون
+    runs-on: windows-latest
+    
+    steps:
+      - name: 📥 دریافت کد
+        uses: actions/checkout@v3
+      
+      - name: 🔧 نصب پایتون
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      
+      - name: 📦 نصب کتابخانه‌ها
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install pyqt5 pyqt5-tools pyqtchart pycryptodome requests
+      
+      - name: 🖼️ بررسی وجود آیکون
+        id: check-icon
+        run: |
+          if (Test-Path "iman.ico") {
+            echo "✅ آیکون پیدا شد"
+            echo "has_icon=true" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "⚠️ آیکون پیدا نشد، از آیکون پیش‌فرض استفاده می‌شود"
+            echo "has_icon=false" >> $env:GITHUB_OUTPUT
+          }
+      
+      - name: 🎨 ایجاد آیکون پیش‌فرض (اگه نباشه)
+        if: steps.check-icon.outputs.has_icon == 'false'
+        run: |
+          # ایجاد یه آیکون ساده با PowerShell
+          Add-Type -AssemblyName System.Drawing
+          $bmp = New-Object System.Drawing.Bitmap(256, 256)
+          $graphics = [System.Drawing.Graphics]::FromImage($bmp)
+          $graphics.Clear([System.Drawing.Color]::FromArgb(255, 52, 73, 94))
+          $font = New-Object System.Drawing.Font("Arial", 80, [System.Drawing.FontStyle]::Bold)
+          $brush = [System.Drawing.Brushes]::White
+          $graphics.DrawString("IM", $font, $brush, 40, 70)
+          $graphics.DrawString("AN", $font, $brush, 40, 150)
+          $graphics.Dispose()
+          $bmp.Save("iman.bmp", [System.Drawing.Imaging.ImageFormat]::Bmp)
+          
+          # تبدیل به آیکون
+          & "$env:SystemRoot\System32\cmd.exe" /c "echo Converting to icon..."
+          # استفاده از ابزار آنلاین یا ادامه با BMP
+          Copy-Item "iman.bmp" "iman.ico"
+      
+      - name: 🔨 ساخت EXE با PyInstaller
+        run: |
+          pyinstaller --onefile `
+            --windowed `
+            --name="ImanAccounting" `
+            --icon="iman.ico" `
+            --add-data="plugins;plugins" `
+            --hidden-import=PyQt5.sip `
+            --hidden-import=Crypto `
+            --hidden-import=Crypto.Cipher `
+            --hidden-import=Crypto.Util.Padding `
+            --version-file=version_info.txt `
+            Latestversion3.py
+      
+      - name: 📦 ایجاد فایل اطلاعات نسخه
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          if ($version -eq "") { $version = "7.1.0" }
+          
+          @"
+          # UTF-8
+          VSVersionInfo(
+            ffi=FixedFileInfo(
+              filevers=($version -replace '\.', ', '),
+              prodvers=($version -replace '\.', ', '),
+              mask=0x3f,
+              flags=0x0,
+              OS=0x40004,
+              fileType=0x1,
+              subtype=0x0,
+              date=(0, 0)
+            ),
+            kids=[
+              StringFileInfo(
+                [
+                  StringTable(
+                    u'040904B0',
+                    [StringStruct(u'CompanyName', u'ایمان حسابداری'),
+                     StringStruct(u'FileDescription', u'نرم‌افزار حسابداری حرفه‌ای'),
+                     StringStruct(u'FileVersion', u'$version'),
+                     StringStruct(u'InternalName', u'ImanAccounting'),
+                     StringStruct(u'LegalCopyright', u'© 2024 ایمان'),
+                     StringStruct(u'OriginalFilename', u'ImanAccounting.exe'),
+                     StringStruct(u'ProductName', u'ایمان حسابداری'),
+                     StringStruct(u'ProductVersion', u'$version')])
+                ]),
+              VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
+            ]
+          )
+          "@ | Out-File -FilePath version_info.txt -Encoding utf8
+      
+      - name: 📤 آپلود EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: ImanAccounting-v${{ github.event.inputs.version }}-with-icon
+          path: dist/ImanAccounting.exe
+      
+      - name: 📦 ایجاد پکیج کامل
+        run: |
+          New-Item -ItemType Directory -Path package -Force
+          Copy-Item dist/ImanAccounting.exe package/
+          Copy-Item iman.ico package/ 2>$null
+          Copy-Item plugins package/ -Recurse -ErrorAction SilentlyContinue
+          
+          # ایجاد فایل README
+          @"
+          # ایمان حسابداری v${{ github.event.inputs.version }}
+          
+          ## 📋 راهنمای سریع
+          - فایل ImanAccounting.exe را اجرا کنید
+          - نیازی به نصب نیست
+          
+          ## 🔑 لایسنس
+          - برای نسخه مدرسه: فایل school.lic را در کنار exe قرار دهید
+          - برای نسخه ادمین: فایل admin.lic را قرار دهید
+          
+          ## 📞 پشتیبانی
+          - ایمیل: neonpresents01@gmail.com
+          - وبسایت: https://neonpresents01-beep.github.io/ImanAI/
+          
+          © 2024 ایمان
+          "@ | Out-File -FilePath package/README.txt -Encoding utf8
+          
+          Compress-Archive -Path package/* -DestinationPath ImanAccounting-Package-v${{ github.event.inputs.version }}.zip
+      
+      - name: 📤 آپلود پکیج
+        uses: actions/upload-artifact@v4
+        with:
+          name: ImanAccounting-Package-v${{ github.event.inputs.version }}
+          path: ImanAccounting-Package-v${{ github.event.inputs.version }}.zip
+      
+      - name: ✅ نمایش نتیجه
+        run: |
+          Write-Host "🎉 ساخت EXE با موفقیت انجام شد!"
+          Write-Host "📁 فایل‌های خروجی:"
+          Get-ChildItem -Path dist -Recurse
