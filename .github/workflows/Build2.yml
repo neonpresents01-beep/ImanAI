@@ -81,7 +81,7 @@ jobs:
             --hidden-import=Crypto.Cipher `
             --hidden-import=Crypto.Util.Padding `
             --version-file=version_info.txt `
-            ImanAccounting.py
+            Latestversion3.py
       
       - name: 📄 ایجاد فایل اطلاعات نسخه
         shell: pwsh
