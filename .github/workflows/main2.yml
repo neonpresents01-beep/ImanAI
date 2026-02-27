@@ -66,7 +66,7 @@ jobs:
             --add-data="plugins;plugins" `
             --hidden-import=PyQt5.sip `
             --hidden-import=Crypto `
-            ImanAccounting.py
+            Latestversion3.py
           
           if ($LASTEXITCODE -eq 0) {
             echo "✅ نسخه ۶۴ بیت ساخته شد"
