@@ -1,27 +1,308 @@
-name: Build EXE
+name: Build ImanAccounting (x64 & x86)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'نسخه برنامه (مثال: 8.0.0)'
+        required: false
+        default: '8.0.0'
 
 jobs:
-  build:
+  build-x64:
+    name: 🏗️ ساخت نسخه ۶۴ بیت
     runs-on: windows-latest
+    permissions:
+      contents: write
+      actions: read
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 دریافت کد منبع
+        uses: actions/checkout@v4
       
-      - uses: actions/setup-python@v5
+      - name: 🔧 نصب پایتون
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       
-      - name: نصب کتابخانه
-        run: pip install pyinstaller pyqt5 pycryptodome
+      - name: 📦 نصب کتابخانه‌ها
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install pyqt5 pyqt5-tools pyqt5-sip
+          pip install pycryptodome
+          echo "✅ کتابخانه‌ها نصب شدند"
       
-      - name: ساخت EXE
-        run: pyinstaller --onefile --name="ImanAccounting" Latestversion3.py
+      - name: 🖼️ ایجاد آیکون (اگه نباشه)
+        shell: pwsh
+        run: |
+          if (!(Test-Path "iman.ico")) {
+            Add-Type -AssemblyName System.Drawing
+            $bmp = New-Object System.Drawing.Bitmap(256, 256)
+            $graphics = [System.Drawing.Graphics]::FromImage($bmp)
+            $graphics.Clear([System.Drawing.Color]::FromArgb(255, 0, 168, 255))
+            $font = New-Object System.Drawing.Font("Arial", 60, [System.Drawing.FontStyle]::Bold)
+            $brush = [System.Drawing.Brushes]::White
+            $graphics.DrawString("Iman", $font, $brush, 30, 80)
+            $graphics.Dispose()
+            $bmp.Save("iman.ico", [System.Drawing.Imaging.ImageFormat]::Icon)
+            echo "✅ آیکون ساخته شد"
+          }
       
-      - uses: actions/upload-artifact@v4
+      - name: 🔨 ساخت EXE (۶۴ بیت)
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          if ($version -eq "") { $version = "8.0.0" }
+          
+          pyinstaller --onefile `
+            --windowed `
+            --name="ImanAccounting_x64" `
+            --icon="iman.ico" `
+            --add-data="plugins;plugins" `
+            --hidden-import=PyQt5.sip `
+            --hidden-import=Crypto `
+            ImanAccounting.py
+          
+          if ($LASTEXITCODE -eq 0) {
+            echo "✅ نسخه ۶۴ بیت ساخته شد"
+          } else {
+            echo "❌ خطا در ساخت نسخه ۶۴ بیت"
+            exit 1
+          }
+      
+      - name: 📤 آپلود نسخه ۶۴ بیت
+        uses: actions/upload-artifact@v4
         with:
-          name: ImanAccounting
-          path: dist/ImanAccounting.exe
+          name: ImanAccounting-x64
+          path: dist/ImanAccounting_x64.exe
+          if-no-files-found: error
+
+  build-x86:
+    name: 🏗️ ساخت نسخه ۳۲ بیت
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      actions: read
+    
+    steps:
+      - name: 📥 دریافت کد منبع
+        uses: actions/checkout@v4
+      
+      - name: 🔧 نصب پایتون
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: 📦 نصب کتابخانه‌ها
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install pyqt5 pyqt5-tools pyqt5-sip
+          pip install pycryptodome
+          echo "✅ کتابخانه‌ها نصب شدند"
+      
+      - name: 🖼️ ایجاد آیکون (اگه نباشه)
+        shell: pwsh
+        run: |
+          if (!(Test-Path "iman.ico")) {
+            Add-Type -AssemblyName System.Drawing
+            $bmp = New-Object System.Drawing.Bitmap(256, 256)
+            $graphics = [System.Drawing.Graphics]::FromImage($bmp)
+            $graphics.Clear([System.Drawing.Color]::FromArgb(255, 0, 168, 255))
+            $font = New-Object System.Drawing.Font("Arial", 60, [System.Drawing.FontStyle]::Bold)
+            $brush = [System.Drawing.Brushes]::White
+            $graphics.DrawString("Iman", $font, $brush, 30, 80)
+            $graphics.Dispose()
+            $bmp.Save("iman.ico", [System.Drawing.Imaging.ImageFormat]::Icon)
+            echo "✅ آیکون ساخته شد"
+          }
+      
+      - name: 🔨 ساخت EXE (۳۲ بیت)
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          if ($version -eq "") { $version = "8.0.0" }
+          
+          pyinstaller --onefile `
+            --windowed `
+            --name="ImanAccounting_x86" `
+            --icon="iman.ico" `
+            --add-data="plugins;plugins" `
+            --hidden-import=PyQt5.sip `
+            --hidden-import=Crypto `
+            --target-arch=32bit `
+            ImanAccounting.py
+          
+          if ($LASTEXITCODE -eq 0) {
+            echo "✅ نسخه ۳۲ بیت ساخته شد"
+          } else {
+            echo "❌ خطا در ساخت نسخه ۳۲ بیت"
+            exit 1
+          }
+      
+      - name: 📤 آپلود نسخه ۳۲ بیت
+        uses: actions/upload-artifact@v4
+        with:
+          name: ImanAccounting-x86
+          path: dist/ImanAccounting_x86.exe
+          if-no-files-found: error
+
+  create-package:
+    name: 📦 ایجاد پکیج نهایی
+    needs: [build-x64, build-x86]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    
+    steps:
+      - name: 📥 دریافت کد منبع
+        uses: actions/checkout@v4
+      
+      - name: 📥 دریافت نسخه ۶۴ بیت
+        uses: actions/download-artifact@v4
+        with:
+          name: ImanAccounting-x64
+          path: ./package
+      
+      - name: 📥 دریافت نسخه ۳۲ بیت
+        uses: actions/download-artifact@v4
+        with:
+          name: ImanAccounting-x86
+          path: ./package
+      
+      - name: 📦 آماده‌سازی پکیج
+        run: |
+          mkdir -p ImanAccounting-Package
+          
+          # کپی فایل‌های EXE
+          cp package/ImanAccounting_x64.exe ImanAccounting-Package/
+          cp package/ImanAccounting_x86.exe ImanAccounting-Package/
+          
+          # کپی پوشه پلاگین‌ها (اگه هست)
+          if [ -d "plugins" ]; then
+            cp -r plugins ImanAccounting-Package/
+            echo "✅ پلاگین‌ها کپی شدند"
+          fi
+          
+          # کپی فایل‌های لایسنس
+          for file in school.lic admin.lic pro.lic trial.lic; do
+            if [ -f "$file" ]; then
+              cp "$file" ImanAccounting-Package/
+            fi
+          done
+          
+          # ایجاد فایل README
+          cat > ImanAccounting-Package/README.txt << 'EOF'
+          ایمان حسابداری - ImanAccounting
+          نسخه 8.0.0
+          
+          📋 راهنمای نصب:
+          ------------------------
+          1️⃣ اگر ویندوز شما ۶۴ بیت است: ImanAccounting_x64.exe را اجرا کنید
+          2️⃣ اگر ویندوز شما ۳۲ بیت است: ImanAccounting_x86.exe را اجرا کنید
+          3️⃣ نیازی به نصب نیست - پرتابل!
+          
+          🤖 قابلیت‌ها:
+          ------------------------
+          ✅ هوش مصنوعی داخلی (ImanAILight)
+          ✅ پیش‌بینی هزینه
+          ✅ تشخیص تراکنش مشکوک
+          ✅ تحلیل روند
+          ✅ تم آبی مشکی حرفه‌ای
+          ✅ سیستم لایسنس هوشمند
+          
+          🔌 پلاگین‌ها:
+          ------------------------
+          پلاگین‌ها در پوشه plugins قرار دارند
+          برای نصب پلاگین جدید، فایل .py را به این پوشه اضافه کنید
+          
+          🔑 لایسنس:
+          ------------------------
+          school.lic : نسخه مخصوص مدارس (رایگان)
+          admin.lic  : نسخه ادمین (مخصوص توسعه‌دهنده)
+          pro.lic    : نسخه حرفه‌ای
+          trial.lic  : نسخه آزمایشی ۳۰ روز
+          
+          📞 پشتیبانی:
+          ------------------------
+          ایمیل: info@iman-ai.ir
+          تلگرام: @ImanAI2026
+          وبسایت: iman-ai.ir
+          
+          © ۱۴۰۳ ImanAI - تمام حقوق محفوظ است
+          EOF
+          
+          # ایجاد فایل ZIP
+          cd ImanAccounting-Package
+          zip -r ../ImanAccounting-v${{ github.event.inputs.version }}.zip *
+          cd ..
+          
+          echo "✅ پکیج نهایی ساخته شد"
+      
+      - name: 📤 آپلود پکیج نهایی
+        uses: actions/upload-artifact@v4
+        with:
+          name: ImanAccounting-Package-v${{ github.event.inputs.version }}
+          path: ImanAccounting-*.zip
+          if-no-files-found: error
+
+  create-release:
+    name: 🚀 ایجاد Release
+    needs: create-package
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    
+    steps:
+      - name: 📥 دریافت پکیج نهایی
+        uses: actions/download-artifact@v4
+        with:
+          name: ImanAccounting-Package-v${{ github.event.inputs.version }}
+          path: ./release
+      
+      - name: 📦 آماده‌سازی فایل‌ها
+        run: |
+          mkdir -p release_files
+          cp release/*.zip release_files/
+          ls -la release_files/
+      
+      - name: 🚀 ایجاد Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release_files/*
+          name: ایمان حسابداری نسخه ${{ github.ref_name }}
+          body: |
+            🎉 **نسخه جدید ایمان حسابداری منتشر شد!**
+            
+            ### 📋 تغییرات نسخه ${{ github.ref_name }}
+            - اضافه شدن ImanAILight داخلی
+            - هوش مصنوعی پیشرفته (پیش‌بینی هزینه، تشخیص ناهنجاری)
+            - تم آبی مشکی حرفه‌ای
+            - قابلیت تغییر تم (تیره/روشن)
+            - پشتیبانی از هر دو نسخه ۳۲ و ۶۴ بیت
+            
+            ### 📥 نحوه نصب
+            1️⃣ فایل ZIP را دانلود کنید
+            2️⃣ محتویات را در یک پوشه اکسترکت کنید
+            3️⃣ فایل مناسب سیستم خود را اجرا کنید:
+               - ImanAccounting_x64.exe (برای ویندوز ۶۴ بیت)
+               - ImanAccounting_x86.exe (برای ویندوز ۳۲ بیت)
+            
+            ### 🔑 لایسنس
+            - برای نسخه مدرسه: فایل school.lic را در پوشه قرار دهید
+            - برای نسخه ادمین: فایل admin.lic را قرار دهید
+            
+            ### 📞 پشتیبانی
+            - ایمیل: info@iman-ai.ir
+            - تلگرام: @ImanAI2026
+            - وبسایت: iman-ai.ir
+          draft: false
+          prerelease: false
