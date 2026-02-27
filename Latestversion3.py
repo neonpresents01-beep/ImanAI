@@ -3,8 +3,8 @@
 
 """
 ایمان حسابداری - ImanAccounting
-نسخه ۷.۴.۰ - نسخه نهایی با همه قابلیت‌ها
-ایمان جان - ۱۴۰۳
+نسخه ۸.۰.۰ - با ImanAILight داخلی
+سینا جان - ۱۴۰۳
 """
 
 import sys
@@ -21,6 +21,7 @@ import platform
 import uuid
 import base64
 import random
+import math
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional, Callable, Tuple
 from abc import ABC, abstractmethod
@@ -31,211 +32,200 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
 
+# ====================== ImanAILight (داخلی) ======================
+
+class Tensor:
+    """تانسور اختصاصی ImanAILight"""
+    
+    def __init__(self, data, shape=None):
+        self.data = data if isinstance(data, list) else [data]
+        self.shape = shape if shape else (len(self.data),)
+    
+    def __add__(self, other):
+        if isinstance(other, (int, float)):
+            return Tensor([x + other for x in self.data])
+        return Tensor([a + b for a, b in zip(self.data, other.data)])
+    
+    def __sub__(self, other):
+        if isinstance(other, (int, float)):
+            return Tensor([x - other for x in self.data])
+        return Tensor([a - b for a, b in zip(self.data, other.data)])
+    
+    def __mul__(self, other):
+        if isinstance(other, (int, float)):
+            return Tensor([x * other for x in self.data])
+        return Tensor([a * b for a, b in zip(self.data, other.data)])
+    
+    def __truediv__(self, other):
+        if isinstance(other, (int, float)):
+            return Tensor([x / other for x in self.data])
+        return Tensor([a / b for a, b in zip(self.data, other.data)])
+    
+    def sum(self):
+        return sum(self.data)
+    
+    def mean(self):
+        return sum(self.data) / len(self.data)
+    
+    def tolist(self):
+        return self.data
+
+
+class ActivationFunctions:
+    """توابع فعالسازی"""
+    
+    @staticmethod
+    def relu(x):
+        return max(0, x)
+    
+    @staticmethod
+    def sigmoid(x):
+        return 1 / (1 + math.exp(-x))
+    
+    @staticmethod
+    def tanh(x):
+        return math.tanh(x)
+    
+    @staticmethod
+    def linear(x):
+        return x
+
+
+class Dense:
+    """لایه تمام متصل"""
+    
+    def __init__(self, input_dim, output_dim, activation='relu'):
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.activation = activation
+        self.weights = Tensor([random.uniform(-1, 1) for _ in range(input_dim * output_dim)])
+        self.bias = Tensor([random.uniform(-1, 1) for _ in range(output_dim)])
+        self.input_data = None
+    
+    def forward(self, x):
+        self.input_data = x
+        # ضرب ماتریسی ساده
+        result = []
+        for i in range(self.output_dim):
+            s = 0
+            for j in range(self.input_dim):
+                s += x.data[j] * self.weights.data[i * self.input_dim + j]
+            s += self.bias.data[i]
+            
+            if self.activation == 'relu':
+                s = ActivationFunctions.relu(s)
+            elif self.activation == 'sigmoid':
+                s = ActivationFunctions.sigmoid(s)
+            elif self.activation == 'tanh':
+                s = ActivationFunctions.tanh(s)
+            
+            result.append(s)
+        
+        return Tensor(result)
+
+
+class Sequential:
+    """مدل ترتیبی"""
+    
+    def __init__(self, name='model'):
+        self.name = name
+        self.layers = []
+    
+    def add(self, layer):
+        self.layers.append(layer)
+    
+    def forward(self, x):
+        for layer in self.layers:
+            x = layer.forward(x)
+        return x
+    
+    def predict(self, x):
+        if not isinstance(x, Tensor):
+            x = Tensor(x)
+        return self.forward(x)
+
+
+class SimpleAI:
+    """هوش مصنوعی ساده برای تحلیل"""
+    
+    @staticmethod
+    def predict_next(data):
+        """پیش‌بینی مقدار بعدی با میانگین متحرک"""
+        if len(data) < 3:
+            return sum(data) / len(data) if data else 0
+        return (data[-1] + data[-2] + data[-3]) / 3
+    
+    @staticmethod
+    def detect_anomaly(data, value):
+        """تشخیص ناهنجاری با انحراف معیار"""
+        if len(data) < 5:
+            return False
+        mean = sum(data) / len(data)
+        variance = sum((x - mean) ** 2 for x in data) / len(data)
+        std = math.sqrt(variance)
+        return abs(value - mean) > 3 * std
+    
+    @staticmethod
+    def trend_analysis(data):
+        """تحلیل روند"""
+        if len(data) < 2:
+            return "نامشخص"
+        if data[-1] > data[0]:
+            return "صعودی 📈"
+        elif data[-1] < data[0]:
+            return "نزولی 📉"
+        else:
+            return "ثابت ➡️"
+
+
 # ====================== اطلاعات برند ======================
 
 APP_NAME = "ایمان حسابداری"
 APP_NAME_EN = "ImanAccounting"
-APP_VERSION = "7.4.0"
-APP_AUTHOR = "ایمان"
+APP_VERSION = "8.0.0"
+APP_AUTHOR = "سینا"
 APP_SLOGAN = "حساب‌هایت رو به ایمان بسپار"
-APP_WEBSITE = "iman-accounting.ir"
-APP_EMAIL = "neonpresents01@gmail.com"
-APP_TELEGRAM = "@ImanAccounting"
+APP_WEBSITE = "iman-ai.ir"
+APP_EMAIL = "info@iman-ai.ir"
+APP_TELEGRAM = "@ImanAI2026"
 
 ADMIN_SECRET_KEY = "Iman@Admin@2024#SuperSecret"
 
-COLORS = {
-    'primary': '#3498db',
-    'secondary': '#2c3e50',
-    'success': '#27ae60',
-    'danger': '#e74c3c',
-    'warning': '#f39c12',
-    'info': '#2980b9',
-    'light': '#ecf0f1',
-    'dark': '#34495e',
-    'white': '#ffffff',
-    'black': '#000000',
-    'background': '#f5f6fa',
-    'card_bg': '#ffffff',
-    'text_primary': '#2c3e50',
-    'text_secondary': '#7f8c8d',
-    'text_light': '#ecf0f1',
-    'border': '#dcdde1'
+THEMES = {
+    "dark": {
+        'name': 'تیره',
+        'primary': '#00a8ff',
+        'secondary': '#192a56',
+        'background': '#2c3a47',
+        'card_bg': '#34495e',
+        'text': '#ecf0f1',
+        'text_secondary': '#bdc3c7',
+        'border': '#2980b9',
+        'success': '#00b894',
+        'danger': '#d63031',
+        'warning': '#f39c12',
+        'info': '#0984e3',
+        'hover': '#74b9ff'
+    },
+    "light": {
+        'name': 'روشن',
+        'primary': '#0984e3',
+        'secondary': '#74b9ff',
+        'background': '#dfe6e9',
+        'card_bg': '#ffffff',
+        'text': '#2d3436',
+        'text_secondary': '#636e72',
+        'border': '#b2bec3',
+        'success': '#00cec9',
+        'danger': '#ff7675',
+        'warning': '#fdcb6e',
+        'info': '#0984e3',
+        'hover': '#00a8ff'
+    }
 }
 
 
-# ====================== مدل‌های داده ======================
-
-class Account:
-    """مدل حساب"""
-    def __init__(self, code: str, name: str, type: str, parent_id: int = None):
-        self.id = None
-        self.code = code
-        self.name = name
-        self.type = type
-        self.parent_id = parent_id
-        self.balance = 0.0
-        self.is_active = True
-        self.created_at = datetime.now()
-    
-    def to_dict(self) -> dict:
-        return {
-            'code': self.code,
-            'name': self.name,
-            'type': self.type,
-            'balance': self.balance
-        }
-
-
-class Transaction:
-    """مدل تراکنش"""
-    def __init__(self, date: datetime, description: str, amount: float, 
-                 type: str, debit_account_id: int, credit_account_id: int):
-        self.id = None
-        self.number = self.generate_number()
-        self.date = date
-        self.description = description
-        self.amount = amount
-        self.type = type
-        self.debit_account_id = debit_account_id
-        self.credit_account_id = credit_account_id
-        self.is_verified = True
-        self.created_at = datetime.now()
-    
-    @staticmethod
-    def generate_number() -> str:
-        return f"TR{datetime.now().strftime('%Y%m%d%H%M%S')}"
-    
-    def to_dict(self) -> dict:
-        return {
-            'number': self.number,
-            'date': self.date.strftime('%Y-%m-%d'),
-            'description': self.description,
-            'amount': self.amount,
-            'type': self.type
-        }
-
-
-# ====================== سیستم پلاگین ======================
-
-class PluginSignature:
-    """مدیریت امضای پلاگین‌ها"""
-    SIGNATURE = "IMAN_ACCOUNTING_PLUGIN_2024"
-    
-    @classmethod
-    def verify_file(cls, file_path: str) -> bool:
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read(500)
-            
-            if f'PLUGIN_SIGNATURE = "{cls.SIGNATURE}"' in content:
-                return True
-            if f"PLUGIN_SIGNATURE = '{cls.SIGNATURE}'" in content:
-                return True
-            return False
-        except:
-            return False
-
-
-class PluginBase:
-    """کلاس پایه برای پلاگین‌ها"""
-    def __init__(self):
-        self.core = None
-        self.name = ""
-        self.version = ""
-        self.author = ""
-    
-    def get_info(self) -> dict:
-        return {
-            'name': self.name,
-            'version': self.version,
-            'author': self.author
-        }
-    
-    def on_load(self, core_proxy):
-        self.core = core_proxy
-        return True
-    
-    def get_menu_items(self) -> list:
-        return []
-    
-    def get_toolbar_items(self) -> list:
-        return []
-    
-    def get_dashboard_widgets(self):
-        return []
-
-
-class PluginLoader:
-    """بارگذاری‌کننده پلاگین‌ها"""
-    
-    def __init__(self, core):
-        self.core = core
-        self.plugins = []
-        self.plugin_folder = "plugins"
-        self.create_folder()
-    
-    def create_folder(self):
-        if not os.path.exists(self.plugin_folder):
-            os.makedirs(self.plugin_folder)
-        
-        init_file = os.path.join(self.plugin_folder, "__init__.py")
-        if not os.path.exists(init_file):
-            with open(init_file, 'w') as f:
-                f.write("# پکیج پلاگین‌ها\n")
-    
-    def discover_plugins(self):
-        """کشف و بارگذاری پلاگین‌ها"""
-        print("🔍 در حال جستجوی پلاگین‌ها...")
-        count = 0
-        
-        if not os.path.exists(self.plugin_folder):
-            return 0
-        
-        for file in os.listdir(self.plugin_folder):
-            if file.endswith(".py") and not file.startswith("__"):
-                file_path = os.path.join(self.plugin_folder, file)
-                if self.load_plugin(file_path):
-                    count += 1
-        
-        print(f"✅ {count} پلاگین بارگذاری شد")
-        return count
-    
-    def load_plugin(self, file_path: str) -> bool:
-        try:
-            module_name = os.path.basename(file_path)[:-3]
-            spec = importlib.util.spec_from_file_location(module_name, file_path)
-            if not spec or not spec.loader:
-                return False
-            
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            
-            # پیدا کردن کلاس پلاگین
-            for name, obj in inspect.getmembers(module):
-                if inspect.isclass(obj) and hasattr(obj, 'get_info'):
-                    plugin_instance = obj()
-                    info = plugin_instance.get_info()
-                    
-                    self.plugins.append({
-                        'instance': plugin_instance,
-                        'info': info,
-                        'file': file_path
-                    })
-                    
-                    print(f"✅ پلاگین {info.get('name', name)} بارگذاری شد")
-                    return True
-            
-            return False
-        except Exception as e:
-            print(f"❌ خطا در بارگذاری {file_path}: {e}")
-            return False
-    
-    def get_all_plugins(self):
-        return self.plugins
-
-
-# ====================== بهینه‌ساز صفحه نمایش ======================
+# ====================== کلاس ScreenOptimizer ======================
 
 class ScreenOptimizer:
     """بهینه‌سازی برای همه صفحه‌ها"""
@@ -265,9 +255,24 @@ class ScreenOptimizer:
             1.0: int(base * 1.1)
         }
         return sizes.get(self.scale, base)
+    
+    def get_margin(self, base=8):
+        return int(base * self.scale)
+    
+    def get_spacing(self, base=10):
+        return int(base * self.scale)
+    
+    def get_icon_size(self, base=24):
+        return int(base * self.scale)
+    
+    def get_card_size(self, base=100):
+        return int(base * self.scale)
+    
+    def get_button_height(self, base=40):
+        return int(base * self.scale)
 
 
-# ====================== سیستم لایسنس ======================
+# ====================== کلاس LicenseManager ======================
 
 class LicenseType(Enum):
     FREE = "رایگان"
@@ -311,7 +316,7 @@ class LicenseManager:
             'type': 'SCHOOL',
             'created': datetime.now().isoformat(),
             'expiry': (datetime.now() + timedelta(days=3650)).isoformat(),
-            'school': 'دبیرستان'
+            'school': 'مدرسه'
         }
         json_data = json.dumps(data)
         key = hashlib.sha256(APP_NAME.encode()).hexdigest()
@@ -443,15 +448,45 @@ class LicenseManager:
             return False
 
 
-# ====================== دیتابیس ======================
+# ====================== کلاس DatabaseManager ======================
+
+class Account:
+    def __init__(self, code: str, name: str, type: str, parent_id: int = None):
+        self.id = None
+        self.code = code
+        self.name = name
+        self.type = type
+        self.parent_id = parent_id
+        self.balance = 0.0
+        self.is_active = True
+        self.created_at = datetime.now()
+
+
+class Transaction:
+    def __init__(self, date: datetime, description: str, amount: float, 
+                 type: str, debit_account_id: int, credit_account_id: int):
+        self.id = None
+        self.number = self.generate_number()
+        self.date = date
+        self.description = description
+        self.amount = amount
+        self.type = type
+        self.debit_account_id = debit_account_id
+        self.credit_account_id = credit_account_id
+        self.is_verified = True
+        self.created_at = datetime.now()
+    
+    @staticmethod
+    def generate_number() -> str:
+        return f"TR{datetime.now().strftime('%Y%m%d%H%M%S')}"
+
 
 class DatabaseManager:
-    """مدیریت پایگاه داده"""
-    
     def __init__(self, db_path: str = "iman_accounting.db"):
         self.db_path = db_path
         self.accounts = []
         self.transactions = []
+        self.ai = SimpleAI()
         self.init_database()
         self.load_data()
     
@@ -492,18 +527,6 @@ class DatabaseManager:
                 )
             ''')
             
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS plugins (
-                    id TEXT PRIMARY KEY,
-                    name TEXT NOT NULL,
-                    version TEXT NOT NULL,
-                    author TEXT,
-                    filename TEXT,
-                    enabled INTEGER DEFAULT 1,
-                    installed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            
             cursor.execute("SELECT COUNT(*) FROM accounts")
             count = cursor.fetchone()[0]
             
@@ -536,6 +559,21 @@ class DatabaseManager:
                 account.balance = acc[4] if acc[4] is not None else 0.0
                 account.parent_id = acc[5]
                 self.accounts.append(account)
+            
+            trans_data = self.execute_query(
+                "SELECT * FROM transactions ORDER BY date DESC LIMIT 100"
+            )
+            
+            for trans in trans_data:
+                date = datetime.strptime(trans[2], '%Y-%m-%d')
+                transaction = Transaction(
+                    date, trans[3] or '', trans[5], trans[4],
+                    trans[6], trans[7]
+                )
+                transaction.id = trans[0]
+                transaction.number = trans[1]
+                transaction.is_verified = bool(trans[8])
+                self.transactions.append(transaction)
             
         except Exception as e:
             print(f"خطا در بارگذاری: {e}")
@@ -644,62 +682,325 @@ class DatabaseManager:
                     expense += trans.amount
         
         return income, expense
-
-
-# ====================== دیالوگ ثبت تراکنش ======================
-
-class TransactionDialog(QDialog):
-    """دیالوگ ثبت تراکنش جدید"""
     
-    def __init__(self, db: DatabaseManager, optimizer: ScreenOptimizer, parent=None):
+    # ====================== قابلیت‌های هوش مصنوعی ======================
+    
+    def predict_next_expense(self):
+        """پیش‌بینی هزینه ماه آینده"""
+        expenses = [t.amount for t in self.transactions if t.type == "هزینه"]
+        return self.ai.predict_next(expenses)
+    
+    def detect_anomaly(self, transaction):
+        """تشخیص تراکنش مشکوک"""
+        expenses = [t.amount for t in self.transactions if t.type == "هزینه"]
+        return self.ai.detect_anomaly(expenses, transaction.amount)
+    
+    def trend_analysis(self):
+        """تحلیل روند هزینه‌ها"""
+        expenses = [t.amount for t in self.transactions if t.type == "هزینه"]
+        return self.ai.trend_analysis(expenses)
+
+
+# ====================== کلاس ThemeManager ======================
+
+class ThemeManager:
+    def __init__(self, optimizer: ScreenOptimizer):
+        self.optimizer = optimizer
+        self.themes = THEMES
+        self.current_theme_name = "dark"
+        self.current_theme = self.themes[self.current_theme_name]
+        self.settings_file = "theme_settings.json"
+        self.load_settings()
+    
+    def load_settings(self):
+        try:
+            with open(self.settings_file, 'r') as f:
+                data = json.load(f)
+                self.current_theme_name = data.get("theme", "dark")
+                self.current_theme = self.themes[self.current_theme_name]
+        except:
+            pass
+    
+    def save_settings(self):
+        try:
+            with open(self.settings_file, 'w') as f:
+                json.dump({"theme": self.current_theme_name}, f)
+        except:
+            pass
+    
+    def set_theme(self, theme_name):
+        if theme_name in self.themes:
+            self.current_theme_name = theme_name
+            self.current_theme = self.themes[theme_name]
+            self.save_settings()
+    
+    def get_style(self):
+        theme = self.current_theme
+        return f"""
+            QMainWindow {{
+                background-color: {theme['background']};
+            }}
+            QMenuBar {{
+                background-color: {theme['secondary']};
+                color: {theme['text']};
+                border: none;
+                font-size: {self.optimizer.get_font_size(10)}px;
+                padding: {self.optimizer.get_margin(5)}px;
+            }}
+            QMenuBar::item {{
+                background: transparent;
+                padding: {self.optimizer.get_margin(8)}px {self.optimizer.get_margin(12)}px;
+            }}
+            QMenuBar::item:selected {{
+                background-color: {theme['primary']};
+                border-radius: {self.optimizer.get_margin(4)}px;
+            }}
+            QMenu {{
+                background-color: {theme['card_bg']};
+                color: {theme['text']};
+                border: 1px solid {theme['border']};
+                font-size: {self.optimizer.get_font_size(10)}px;
+            }}
+            QMenu::item:selected {{
+                background-color: {theme['primary']};
+                color: white;
+            }}
+            QTabWidget::pane {{
+                background-color: {theme['background']};
+                border: none;
+            }}
+            QTabBar::tab {{
+                background-color: {theme['card_bg']};
+                color: {theme['text']};
+                padding: {self.optimizer.get_margin(8)}px {self.optimizer.get_margin(16)}px;
+                margin-right: 2px;
+                border: 1px solid {theme['border']};
+                border-bottom: none;
+                border-top-left-radius: {self.optimizer.get_margin(6)}px;
+                border-top-right-radius: {self.optimizer.get_margin(6)}px;
+                font-size: {self.optimizer.get_font_size(10)}px;
+            }}
+            QTabBar::tab:selected {{
+                background-color: {theme['primary']};
+                color: white;
+            }}
+            QTabBar::tab:hover:!selected {{
+                background-color: {theme['hover']};
+            }}
+            QStatusBar {{
+                background-color: {theme['secondary']};
+                color: {theme['text']};
+                font-size: {self.optimizer.get_font_size(9)}px;
+            }}
+            QToolBar {{
+                background-color: {theme['card_bg']};
+                border: none;
+                spacing: {self.optimizer.get_spacing(5)}px;
+                padding: {self.optimizer.get_margin(5)}px;
+            }}
+        """
+
+
+# ====================== کلاس StatCard ======================
+
+class StatCard(QFrame):
+    def __init__(self, title: str, value: str, icon: str, color: str, optimizer: ScreenOptimizer, theme: dict):
+        super().__init__()
+        self.optimizer = optimizer
+        self.theme = theme
+        
+        self.setFrameStyle(QFrame.StyledPanel)
+        self.setStyleSheet(f"""
+            QFrame {{
+                background: {color};
+                border-radius: {self.optimizer.get_margin(10)}px;
+                padding: {self.optimizer.get_margin(10)}px;
+            }}
+        """)
+        
+        layout = QHBoxLayout()
+        layout.setContentsMargins(
+            self.optimizer.get_margin(15),
+            self.optimizer.get_margin(10),
+            self.optimizer.get_margin(15),
+            self.optimizer.get_margin(10)
+        )
+        layout.setSpacing(self.optimizer.get_spacing(10))
+        
+        icon_label = QLabel(icon)
+        icon_label.setStyleSheet(f"font-size: {self.optimizer.get_icon_size(30)}px; background: transparent; color: white;")
+        layout.addWidget(icon_label)
+        
+        text_layout = QVBoxLayout()
+        text_layout.setSpacing(2)
+        
+        title_label = QLabel(title)
+        title_label.setStyleSheet(f"font-size: {self.optimizer.get_font_size(12)}px; color: rgba(255,255,255,0.8); background: transparent;")
+        text_layout.addWidget(title_label)
+        
+        self.value_label = QLabel(value)
+        self.value_label.setStyleSheet(f"font-size: {self.optimizer.get_font_size(20)}px; font-weight: bold; color: white; background: transparent;")
+        text_layout.addWidget(self.value_label)
+        
+        layout.addLayout(text_layout)
+        layout.addStretch()
+        
+        self.setLayout(layout)
+        self.setFixedHeight(self.optimizer.get_card_size(100))
+    
+    def update_value(self, value: str):
+        self.value_label.setText(value)
+
+
+# ====================== کلاس AIDashboard ======================
+
+class AIDashboard(QDialog):
+    """داشبورد هوش مصنوعی"""
+    
+    def __init__(self, db: DatabaseManager, optimizer: ScreenOptimizer, theme: dict, parent=None):
         super().__init__(parent)
         self.db = db
         self.optimizer = optimizer
+        self.theme = theme
+        
+        self.setWindowTitle("🤖 داشبورد هوش مصنوعی")
+        self.resize(self.optimizer.get_size(600), self.optimizer.get_size(500))
+        
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {self.theme['background']};
+            }}
+            QGroupBox {{
+                color: {self.theme['text']};
+                border: 2px solid {self.theme['primary']};
+                border-radius: {self.optimizer.get_margin(5)}px;
+                margin-top: {self.optimizer.get_margin(10)}px;
+                font-weight: bold;
+            }}
+            QGroupBox::title {{
+                subcontrol-origin: margin;
+                left: {self.optimizer.get_margin(10)}px;
+                padding: 0 {self.optimizer.get_margin(5)}px 0 {self.optimizer.get_margin(5)}px;
+                color: {self.theme['primary']};
+            }}
+            QLabel {{
+                color: {self.theme['text']};
+            }}
+            QPushButton {{
+                background-color: {self.theme['primary']};
+                color: white;
+                border: none;
+                border-radius: {self.optimizer.get_margin(5)}px;
+                padding: {self.optimizer.get_margin(8)}px;
+                font-weight: bold;
+            }}
+        """)
+        
+        self.init_ui()
+    
+    def init_ui(self):
+        layout = QVBoxLayout()
+        layout.setSpacing(self.optimizer.get_spacing(15))
+        
+        title = QLabel("🤖 داشبورد هوش مصنوعی")
+        title.setStyleSheet(f"font-size: {self.optimizer.get_font_size(18)}px; font-weight: bold; color: {self.theme['primary']};")
+        title.setAlignment(Qt.AlignCenter)
+        layout.addWidget(title)
+        
+        # پیش‌بینی هزینه
+        pred_group = QGroupBox("📊 پیش‌بینی هزینه")
+        pred_layout = QVBoxLayout()
+        
+        expenses = [t.amount for t in self.db.get_all_transactions() if t.type == "هزینه"]
+        if expenses:
+            pred = self.db.predict_next_expense()
+            trend = self.db.trend_analysis()
+            
+            pred_layout.addWidget(QLabel(f"میانگین هزینه‌ها: {sum(expenses)/len(expenses):,.0f}"))
+            pred_layout.addWidget(QLabel(f"🔮 پیش‌بینی ماه آینده: {pred:,.0f}"))
+            pred_layout.addWidget(QLabel(f"📈 روند: {trend}"))
+        else:
+            pred_layout.addWidget(QLabel("داده کافی برای پیش‌بینی وجود ندارد"))
+        
+        pred_group.setLayout(pred_layout)
+        layout.addWidget(pred_group)
+        
+        # تشخیص ناهنجاری
+        anomaly_group = QGroupBox("🚨 تراکنش‌های مشکوک")
+        anomaly_layout = QVBoxLayout()
+        
+        suspicious_count = 0
+        for t in self.db.get_all_transactions(50):
+            if self.db.detect_anomaly(t):
+                suspicious_count += 1
+        
+        anomaly_layout.addWidget(QLabel(f"تعداد تراکنش‌های مشکوک: {suspicious_count}"))
+        
+        if suspicious_count > 0:
+            anomaly_layout.addWidget(QLabel("⚠️ برخی تراکنش‌ها نیاز به بررسی دارند"))
+        else:
+            anomaly_layout.addWidget(QLabel("✅ هیچ تراکنش مشکوکی یافت نشد"))
+        
+        anomaly_group.setLayout(anomaly_layout)
+        layout.addWidget(anomaly_group)
+        
+        # دکمه‌ها
+        btn_layout = QHBoxLayout()
+        
+        close_btn = QPushButton("✖ بستن")
+        close_btn.clicked.connect(self.accept)
+        btn_layout.addWidget(close_btn)
+        
+        layout.addLayout(btn_layout)
+        
+        self.setLayout(layout)
+
+
+# ====================== کلاس TransactionDialog ======================
+
+class TransactionDialog(QDialog):
+    def __init__(self, db: DatabaseManager, optimizer: ScreenOptimizer, theme: dict, parent=None):
+        super().__init__(parent)
+        self.db = db
+        self.optimizer = optimizer
+        self.theme = theme
         
         self.setWindowTitle("➕ ثبت تراکنش جدید")
         self.setFixedSize(self.optimizer.get_size(550), self.optimizer.get_size(600))
         
         self.setStyleSheet(f"""
             QDialog {{
-                background-color: {COLORS['background']};
+                background-color: {self.theme['card_bg']};
+                border: 2px solid {self.theme['primary']};
+                border-radius: {self.optimizer.get_margin(15)}px;
             }}
             QLabel {{
-                color: {COLORS['text_primary']};
+                color: {self.theme['text']};
                 font-size: {self.optimizer.get_font_size(11)}px;
             }}
             QLineEdit, QTextEdit, QComboBox, QDateEdit, QDoubleSpinBox {{
-                padding: 10px;
-                border: 2px solid {COLORS['border']};
-                border-radius: 6px;
-                background: white;
-                color: {COLORS['text_primary']};
+                padding: {self.optimizer.get_margin(10)}px;
+                border: 2px solid {self.theme['border']};
+                border-radius: {self.optimizer.get_margin(6)}px;
+                background: {self.theme['background']};
+                color: {self.theme['text']};
                 font-size: {self.optimizer.get_font_size(11)}px;
-                min-height: 40px;
-            }}
-            QComboBox QAbstractItemView {{
-                background-color: white;
-                color: {COLORS['text_primary']};
-                selection-background-color: {COLORS['primary']};
-                selection-color: white;
-                font-size: {self.optimizer.get_font_size(11)}px;
+                min-height: {self.optimizer.get_button_height(40)}px;
             }}
             QPushButton {{
-                padding: 12px 24px;
+                padding: {self.optimizer.get_margin(12)}px {self.optimizer.get_margin(24)}px;
                 border: none;
-                border-radius: 6px;
+                border-radius: {self.optimizer.get_margin(6)}px;
                 font-weight: bold;
                 font-size: {self.optimizer.get_font_size(12)}px;
-                min-height: 45px;
+                min-height: {self.optimizer.get_button_height(45)}px;
             }}
             QPushButton#saveBtn {{
-                background-color: {COLORS['success']};
+                background-color: {self.theme['success']};
                 color: white;
             }}
-            QPushButton#saveBtn:hover {{
-                background-color: #229954;
-            }}
             QPushButton#cancelBtn {{
-                background-color: {COLORS['danger']};
+                background-color: {self.theme['danger']};
                 color: white;
             }}
         """)
@@ -708,49 +1009,48 @@ class TransactionDialog(QDialog):
     
     def init_ui(self):
         layout = QVBoxLayout()
-        layout.setSpacing(20)
-        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(self.optimizer.get_spacing(20))
+        layout.setContentsMargins(
+            self.optimizer.get_margin(30),
+            self.optimizer.get_margin(30),
+            self.optimizer.get_margin(30),
+            self.optimizer.get_margin(30)
+        )
         
         form_layout = QFormLayout()
-        form_layout.setSpacing(15)
+        form_layout.setSpacing(self.optimizer.get_spacing(15))
         form_layout.setLabelAlignment(Qt.AlignRight)
         
-        # تاریخ
         self.date_edit = QDateEdit()
         self.date_edit.setDate(QDate.currentDate())
         self.date_edit.setCalendarPopup(True)
-        self.date_edit.setFixedHeight(45)
+        self.date_edit.setFixedHeight(self.optimizer.get_button_height(45))
         form_layout.addRow("📅 تاریخ:", self.date_edit)
         
-        # شرح
         self.desc_edit = QTextEdit()
-        self.desc_edit.setMaximumHeight(100)
+        self.desc_edit.setMaximumHeight(self.optimizer.get_button_height(100))
         self.desc_edit.setPlaceholderText("شرح تراکنش را وارد کنید...")
         form_layout.addRow("📝 شرح:", self.desc_edit)
         
-        # نوع
         self.type_combo = QComboBox()
         self.type_combo.addItems(["درآمد", "هزینه", "انتقال"])
-        self.type_combo.setFixedHeight(45)
+        self.type_combo.setFixedHeight(self.optimizer.get_button_height(45))
         form_layout.addRow("📊 نوع:", self.type_combo)
         
-        # مبلغ
         self.amount_spin = QDoubleSpinBox()
         self.amount_spin.setRange(0, 999999999)
         self.amount_spin.setPrefix("ریال ")
         self.amount_spin.setGroupSeparatorShown(True)
-        self.amount_spin.setFixedHeight(45)
+        self.amount_spin.setFixedHeight(self.optimizer.get_button_height(45))
         form_layout.addRow("💰 مبلغ:", self.amount_spin)
         
-        # حساب بدهکار
         self.debit_combo = QComboBox()
-        self.debit_combo.setFixedHeight(45)
+        self.debit_combo.setFixedHeight(self.optimizer.get_button_height(45))
         self.debit_combo.setMaxVisibleItems(15)
         form_layout.addRow("📤 حساب بدهکار:", self.debit_combo)
         
-        # حساب بستانکار
         self.credit_combo = QComboBox()
-        self.credit_combo.setFixedHeight(45)
+        self.credit_combo.setFixedHeight(self.optimizer.get_button_height(45))
         self.credit_combo.setMaxVisibleItems(15)
         form_layout.addRow("📥 حساب بستانکار:", self.credit_combo)
         
@@ -758,22 +1058,26 @@ class TransactionDialog(QDialog):
         
         self.load_accounts()
         
+        # هشدار هوش مصنوعی (اگه تراکنش مشکوک باشه)
+        if self.amount_spin.value() > 0:
+            warning_label = QLabel("")
+            layout.addWidget(warning_label)
+        
         btn_layout = QHBoxLayout()
-        btn_layout.setSpacing(15)
+        btn_layout.setSpacing(self.optimizer.get_spacing(15))
         
         self.save_btn = QPushButton("💾 ذخیره تراکنش")
         self.save_btn.setObjectName("saveBtn")
-        self.save_btn.setFixedHeight(45)
+        self.save_btn.setFixedHeight(self.optimizer.get_button_height(45))
         self.save_btn.clicked.connect(self.save_transaction)
         btn_layout.addWidget(self.save_btn)
         
         self.cancel_btn = QPushButton("✖ انصراف")
         self.cancel_btn.setObjectName("cancelBtn")
-        self.cancel_btn.setFixedHeight(45)
+        self.cancel_btn.setFixedHeight(self.optimizer.get_button_height(45))
         self.cancel_btn.clicked.connect(self.reject)
         btn_layout.addWidget(self.cancel_btn)
         
-        btn_layout.addStretch()
         layout.addLayout(btn_layout)
         
         self.setLayout(layout)
@@ -828,6 +1132,17 @@ class TransactionDialog(QDialog):
             credit_account_id=credit_id
         )
         
+        # بررسی با هوش مصنوعی
+        if self.db.detect_anomaly(transaction):
+            reply = QMessageBox.question(
+                self, 
+                "⚠️ هشدار هوش مصنوعی",
+                "این تراکنش مشکوک تشخیص داده شده!\nآیا مطمئن هستید؟",
+                QMessageBox.Yes | QMessageBox.No
+            )
+            if reply == QMessageBox.No:
+                return
+        
         if self.db.add_transaction(transaction):
             QMessageBox.information(self, "موفق", "✅ تراکنش با موفقیت ثبت شد")
             self.accept()
@@ -835,18 +1150,45 @@ class TransactionDialog(QDialog):
             QMessageBox.critical(self, "خطا", "❌ خطا در ثبت تراکنش")
 
 
-# ====================== دیالوگ لیست حساب‌ها ======================
+# ====================== کلاس AccountsDialog ======================
 
 class AccountsDialog(QDialog):
-    """دیالوگ نمایش لیست حساب‌ها"""
-    
-    def __init__(self, db: DatabaseManager, optimizer: ScreenOptimizer, parent=None):
+    def __init__(self, db: DatabaseManager, optimizer: ScreenOptimizer, theme: dict, parent=None):
         super().__init__(parent)
         self.db = db
         self.optimizer = optimizer
+        self.theme = theme
         
         self.setWindowTitle("📊 لیست حساب‌ها")
         self.setFixedSize(self.optimizer.get_size(600), self.optimizer.get_size(400))
+        
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {self.theme['background']};
+            }}
+            QTableWidget {{
+                background-color: {self.theme['card_bg']};
+                color: {self.theme['text']};
+                alternate-background-color: {self.theme['secondary']};
+                gridline-color: {self.theme['border']};
+                font-size: {self.optimizer.get_font_size(10)}px;
+            }}
+            QHeaderView::section {{
+                background-color: {self.theme['secondary']};
+                color: {self.theme['text']};
+                padding: {self.optimizer.get_margin(5)}px;
+                font-size: {self.optimizer.get_font_size(10)}px;
+            }}
+            QPushButton {{
+                background-color: {self.theme['primary']};
+                color: white;
+                border: none;
+                border-radius: {self.optimizer.get_margin(5)}px;
+                padding: {self.optimizer.get_margin(10)}px {self.optimizer.get_margin(20)}px;
+                font-size: {self.optimizer.get_font_size(11)}px;
+                font-weight: bold;
+            }}
+        """)
         
         layout = QVBoxLayout()
         
@@ -869,28 +1211,67 @@ class AccountsDialog(QDialog):
         accounts = self.db.get_all_accounts()
         self.table.setRowCount(len(accounts))
         
+        type_map = {
+            'asset': 'دارایی',
+            'liability': 'بدهی',
+            'equity': 'سرمایه',
+            'revenue': 'درآمد',
+            'expense': 'هزینه'
+        }
+        
         for i, acc in enumerate(accounts):
             self.table.setItem(i, 0, QTableWidgetItem(acc.code))
             self.table.setItem(i, 1, QTableWidgetItem(acc.name))
-            self.table.setItem(i, 2, QTableWidgetItem(acc.type))
+            self.table.setItem(i, 2, QTableWidgetItem(type_map.get(acc.type, acc.type)))
             
             balance = QTableWidgetItem(f"{acc.balance:,.0f}")
             balance.setTextAlignment(Qt.AlignRight)
+            if acc.balance >= 0:
+                balance.setForeground(QColor(self.theme['success']))
+            else:
+                balance.setForeground(QColor(self.theme['danger']))
             self.table.setItem(i, 3, balance)
 
 
-# ====================== دیالوگ لیست تراکنش‌ها ======================
+# ====================== کلاس TransactionsDialog ======================
 
 class TransactionsDialog(QDialog):
-    """دیالوگ نمایش لیست تراکنش‌ها"""
-    
-    def __init__(self, db: DatabaseManager, optimizer: ScreenOptimizer, parent=None):
+    def __init__(self, db: DatabaseManager, optimizer: ScreenOptimizer, theme: dict, parent=None):
         super().__init__(parent)
         self.db = db
         self.optimizer = optimizer
+        self.theme = theme
         
         self.setWindowTitle("📋 لیست تراکنش‌ها")
         self.setFixedSize(self.optimizer.get_size(800), self.optimizer.get_size(500))
+        
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {self.theme['background']};
+            }}
+            QTableWidget {{
+                background-color: {self.theme['card_bg']};
+                color: {self.theme['text']};
+                alternate-background-color: {self.theme['secondary']};
+                gridline-color: {self.theme['border']};
+                font-size: {self.optimizer.get_font_size(10)}px;
+            }}
+            QHeaderView::section {{
+                background-color: {self.theme['secondary']};
+                color: {self.theme['text']};
+                padding: {self.optimizer.get_margin(5)}px;
+                font-size: {self.optimizer.get_font_size(10)}px;
+            }}
+            QPushButton {{
+                background-color: {self.theme['primary']};
+                color: white;
+                border: none;
+                border-radius: {self.optimizer.get_margin(5)}px;
+                padding: {self.optimizer.get_margin(10)}px {self.optimizer.get_margin(20)}px;
+                font-size: {self.optimizer.get_font_size(11)}px;
+                font-weight: bold;
+            }}
+        """)
         
         layout = QVBoxLayout()
         
@@ -902,6 +1283,11 @@ class TransactionsDialog(QDialog):
         self.load_transactions()
         
         layout.addWidget(self.table)
+        
+        # دکمه تحلیل هوشمند
+        ai_btn = QPushButton("🤖 تحلیل هوشمند تراکنش‌ها")
+        ai_btn.clicked.connect(self.show_ai_analysis)
+        layout.addWidget(ai_btn)
         
         close_btn = QPushButton("✖ بستن")
         close_btn.clicked.connect(self.accept)
@@ -921,118 +1307,109 @@ class TransactionsDialog(QDialog):
             
             amount = QTableWidgetItem(f"{trans.amount:,.0f}")
             amount.setTextAlignment(Qt.AlignRight)
+            
+            # رنگ‌بندی با هوش مصنوعی
+            if self.db.detect_anomaly(trans):
+                amount.setForeground(QColor(self.theme['danger']))
+                amount.setToolTip("⚠️ تراکنش مشکوک")
+            elif trans.type == "درآمد":
+                amount.setForeground(QColor(self.theme['success']))
+            else:
+                amount.setForeground(QColor(self.theme['warning']))
+            
             self.table.setItem(i, 4, amount)
             
             status = QTableWidgetItem("✅ تأیید")
-            status.setForeground(QColor(COLORS['success']))
+            status.setForeground(QColor(self.theme['success']))
             self.table.setItem(i, 5, status)
-
-
-# ====================== دیالوگ مدیریت پلاگین ======================
-
-class PluginManagerDialog(QDialog):
-    """دیالوگ مدیریت پلاگین‌ها"""
     
-    def __init__(self, plugin_loader: PluginLoader, optimizer: ScreenOptimizer, parent=None):
-        super().__init__(parent)
-        self.plugin_loader = plugin_loader
-        self.optimizer = optimizer
-        
-        self.setWindowTitle("📦 مدیریت پلاگین‌ها")
-        self.setFixedSize(self.optimizer.get_size(600), self.optimizer.get_size(400))
-        
-        layout = QVBoxLayout()
-        
-        # لیست پلاگین‌ها
-        self.list_widget = QListWidget()
-        
-        for plugin in self.plugin_loader.get_all_plugins():
-            info = plugin['info']
-            item_text = f"✅ {info.get('name', 'ناشناس')} v{info.get('version', '1.0')} - {info.get('author', 'ناشناس')}"
-            self.list_widget.addItem(item_text)
-        
-        if self.list_widget.count() == 0:
-            self.list_widget.addItem("ℹ️ هیچ پلاگینی نصب نشده است")
-        
-        layout.addWidget(QLabel("پلاگین‌های نصب شده:"))
-        layout.addWidget(self.list_widget)
-        
-        # دکمه‌ها
-        btn_layout = QHBoxLayout()
-        
-        refresh_btn = QPushButton("🔄 بروزرسانی")
-        refresh_btn.clicked.connect(self.refresh)
-        btn_layout.addWidget(refresh_btn)
-        
-        close_btn = QPushButton("✖ بستن")
-        close_btn.clicked.connect(self.accept)
-        btn_layout.addWidget(close_btn)
-        
-        layout.addLayout(btn_layout)
-        
-        self.setLayout(layout)
-    
-    def refresh(self):
-        self.plugin_loader.discover_plugins()
-        self.list_widget.clear()
-        
-        for plugin in self.plugin_loader.get_all_plugins():
-            info = plugin['info']
-            item_text = f"✅ {info.get('name', 'ناشناس')} v{info.get('version', '1.0')}"
-            self.list_widget.addItem(item_text)
-        
-        if self.list_widget.count() == 0:
-            self.list_widget.addItem("ℹ️ هیچ پلاگینی نصب نشده است")
+    def show_ai_analysis(self):
+        dialog = AIDashboard(self.db, self.optimizer, self.theme, self)
+        dialog.exec_()
 
 
-# ====================== دیالوگ لایسنس ======================
+# ====================== کلاس LicenseDialog ======================
 
 class LicenseDialog(QDialog):
-    """دیالوگ فعال‌سازی لایسنس"""
-    
-    def __init__(self, license_manager: LicenseManager, optimizer: ScreenOptimizer, parent=None):
+    def __init__(self, license_manager: LicenseManager, optimizer: ScreenOptimizer, theme: dict, parent=None):
         super().__init__(parent)
         self.license = license_manager
         self.optimizer = optimizer
+        self.theme = theme
         
         self.setWindowTitle("🔑 فعال‌سازی لایسنس")
         self.setFixedSize(self.optimizer.get_size(500), self.optimizer.get_size(400))
         
-        layout = QVBoxLayout()
-        layout.setSpacing(20)
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {self.theme['card_bg']};
+                border: 2px solid {self.theme['primary']};
+                border-radius: {self.optimizer.get_margin(15)}px;
+            }}
+            QLabel {{
+                color: {self.theme['text']};
+                font-size: {self.optimizer.get_font_size(11)}px;
+            }}
+            QTextEdit {{
+                border: 2px solid {self.theme['border']};
+                border-radius: {self.optimizer.get_margin(6)}px;
+                padding: {self.optimizer.get_margin(8)}px;
+                background: {self.theme['background']};
+                color: {self.theme['text']};
+                font-family: monospace;
+                font-size: {self.optimizer.get_font_size(10)}px;
+            }}
+            QPushButton {{
+                background-color: {self.theme['success']};
+                color: white;
+                border: none;
+                border-radius: {self.optimizer.get_margin(6)}px;
+                padding: {self.optimizer.get_margin(10)}px {self.optimizer.get_margin(20)}px;
+                font-weight: bold;
+                font-size: {self.optimizer.get_font_size(11)}px;
+                min-height: {self.optimizer.get_button_height(40)}px;
+            }}
+            QPushButton:hover {{
+                background-color: {self.theme['hover']};
+            }}
+        """)
         
-        # عنوان
-        title = QLabel("فعال‌سازی لایسنس")
-        title.setStyleSheet("font-size: 18px; font-weight: bold;")
+        layout = QVBoxLayout()
+        layout.setSpacing(self.optimizer.get_spacing(20))
+        
+        title = QLabel("🔑 فعال‌سازی لایسنس")
+        title.setStyleSheet(f"font-size: {self.optimizer.get_font_size(18)}px; font-weight: bold; color: {self.theme['primary']};")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
         
-        # HWID
         hwid_label = QLabel(f"شناسه سیستم:")
         layout.addWidget(hwid_label)
         
         hwid_value = QLabel(self.license.hardware_id)
-        hwid_value.setStyleSheet("font-family: monospace; background: #ecf0f1; padding: 10px; border-radius: 5px;")
+        hwid_value.setStyleSheet(f"""
+            font-family: monospace;
+            background: {self.theme['background']};
+            color: {self.theme['text']};
+            padding: {self.optimizer.get_margin(10)}px;
+            border-radius: {self.optimizer.get_margin(5)}px;
+            border: 1px solid {self.theme['border']};
+        """)
         hwid_value.setTextInteractionFlags(Qt.TextSelectableByMouse)
         hwid_value.setAlignment(Qt.AlignCenter)
         layout.addWidget(hwid_value)
         
-        # وضعیت فعلی
         status_label = QLabel(f"وضعیت فعلی: {self.license.license_type.value}")
         layout.addWidget(status_label)
         
-        # ورود لایسنس
         self.key_input = QTextEdit()
         self.key_input.setPlaceholderText("کلید لایسنس را وارد کنید...")
-        self.key_input.setMaximumHeight(100)
+        self.key_input.setMaximumHeight(self.optimizer.get_button_height(100))
         layout.addWidget(self.key_input)
         
-        # دکمه فعال‌سازی
         activate_btn = QPushButton("✅ فعال‌سازی")
         activate_btn.clicked.connect(self.activate)
         layout.addWidget(activate_btn)
         
-        # دکمه بستن
         close_btn = QPushButton("✖ بستن")
         close_btn.clicked.connect(self.reject)
         layout.addWidget(close_btn)
@@ -1054,51 +1431,66 @@ class LicenseDialog(QDialog):
             QMessageBox.critical(self, "خطا", msg)
 
 
-# ====================== دیالوگ درباره ======================
+# ====================== کلاس AboutDialog ======================
 
 class AboutDialog(QDialog):
-    """دیالوگ درباره برنامه"""
-    
-    def __init__(self, license_manager: LicenseManager, optimizer: ScreenOptimizer, parent=None):
+    def __init__(self, license_manager: LicenseManager, optimizer: ScreenOptimizer, theme: dict, parent=None):
         super().__init__(parent)
         self.license = license_manager
         self.optimizer = optimizer
+        self.theme = theme
         
         self.setWindowTitle("ℹ️ درباره ایمان حسابداری")
-        self.setFixedSize(self.optimizer.get_size(500), self.optimizer.get_size(400))
+        self.setFixedSize(self.optimizer.get_size(500), self.optimizer.get_size(450))
+        
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {self.theme['card_bg']};
+                border: 2px solid {self.theme['primary']};
+                border-radius: {self.optimizer.get_margin(15)}px;
+            }}
+            QLabel {{
+                color: {self.theme['text']};
+            }}
+            QPushButton {{
+                background-color: {self.theme['primary']};
+                color: white;
+                border: none;
+                border-radius: {self.optimizer.get_margin(6)}px;
+                padding: {self.optimizer.get_margin(10)}px;
+                font-weight: bold;
+            }}
+        """)
         
         layout = QVBoxLayout()
-        layout.setSpacing(10)
         
-        # لوگو
         logo = QLabel("⚡💰")
-        logo.setStyleSheet("font-size: 48px;")
+        logo.setStyleSheet(f"font-size: {self.optimizer.get_icon_size(60)}px;")
         logo.setAlignment(Qt.AlignCenter)
         layout.addWidget(logo)
         
-        # عنوان
         title = QLabel(APP_NAME)
-        title.setStyleSheet("font-size: 20px; font-weight: bold; color: #3498db;")
+        title.setStyleSheet(f"font-size: {self.optimizer.get_font_size(22)}px; font-weight: bold; color: {self.theme['primary']};")
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
         
-        # نسخه
-        version = QLabel(f"نسخه {APP_VERSION}")
+        version = QLabel(f"نسخه {APP_VERSION} (با ImanAILight داخلی)")
         version.setAlignment(Qt.AlignCenter)
         layout.addWidget(version)
         
-        # شعار
         slogan = QLabel(APP_SLOGAN)
-        slogan.setStyleSheet("color: #27ae60; font-style: italic;")
+        slogan.setStyleSheet(f"color: {self.theme['success']}; font-style: italic;")
         slogan.setAlignment(Qt.AlignCenter)
         layout.addWidget(slogan)
         
-        # اطلاعات تماس
+        author = QLabel(f"توسعه‌دهنده: {APP_AUTHOR}")
+        author.setAlignment(Qt.AlignCenter)
+        layout.addWidget(author)
+        
         contact = QLabel(f"📧 {APP_EMAIL}\n🌐 {APP_WEBSITE}\n📱 {APP_TELEGRAM}")
         contact.setAlignment(Qt.AlignCenter)
         layout.addWidget(contact)
         
-        # وضعیت لایسنس
         if self.license.is_school:
             license_text = "🏫 نسخه ویژه مدرسه"
         elif self.license.is_admin:
@@ -1107,13 +1499,17 @@ class AboutDialog(QDialog):
             license_text = f"🔑 {self.license.license_type.value}"
         
         license_label = QLabel(license_text)
-        license_label.setStyleSheet("color: #27ae60; font-weight: bold;")
+        license_label.setStyleSheet(f"color: {self.theme['success']}; font-weight: bold;")
         license_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(license_label)
         
+        ai_label = QLabel("🤖 مجهز به ImanAILight - هوش مصنوعی اختصاصی")
+        ai_label.setStyleSheet(f"color: {self.theme['primary']};")
+        ai_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(ai_label)
+        
         layout.addStretch()
         
-        # دکمه بستن
         close_btn = QPushButton("✖ بستن")
         close_btn.clicked.connect(self.accept)
         layout.addWidget(close_btn)
@@ -1121,86 +1517,50 @@ class AboutDialog(QDialog):
         self.setLayout(layout)
 
 
-# ====================== کارت آماری ======================
-
-class StatCard(QFrame):
-    """کارت آمار"""
-    
-    def __init__(self, title: str, value: str, icon: str, color: str):
-        super().__init__()
-        self.setFrameStyle(QFrame.StyledPanel)
-        self.setStyleSheet(f"""
-            QFrame {{
-                background: {color};
-                border-radius: 10px;
-                padding: 15px;
-            }}
-        """)
-        
-        layout = QHBoxLayout()
-        
-        icon_label = QLabel(icon)
-        icon_label.setStyleSheet("font-size: 30px; background: transparent; color: white;")
-        layout.addWidget(icon_label)
-        
-        text_layout = QVBoxLayout()
-        title_label = QLabel(title)
-        title_label.setStyleSheet("font-size: 12px; color: rgba(255,255,255,0.8);")
-        text_layout.addWidget(title_label)
-        
-        self.value_label = QLabel(value)
-        self.value_label.setStyleSheet("font-size: 20px; font-weight: bold; color: white;")
-        text_layout.addWidget(self.value_label)
-        
-        layout.addLayout(text_layout)
-        layout.addStretch()
-        
-        self.setLayout(layout)
-    
-    def update_value(self, value):
-        self.value_label.setText(value)
-
-
-# ====================== داشبورد ======================
+# ====================== کلاس DashboardWidget ======================
 
 class DashboardWidget(QWidget):
-    """داشبورد اصلی"""
-    
-    def __init__(self, core, db, license_mgr, plugin_loader):
+    def __init__(self, db: DatabaseManager, license_mgr: LicenseManager, theme_manager: ThemeManager):
         super().__init__()
-        self.core = core
         self.db = db
         self.license = license_mgr
-        self.plugin_loader = plugin_loader
-        self.optimizer = ScreenOptimizer()
+        self.theme_manager = theme_manager
+        self.optimizer = theme_manager.optimizer
+        self.theme = theme_manager.current_theme
         
-        self.setStyleSheet(f"background-color: {COLORS['background']};")
+        self.setStyleSheet(f"background-color: {self.theme['background']};")
         
         self.init_ui()
         self.refresh()
     
     def init_ui(self):
         layout = QVBoxLayout()
-        layout.setSpacing(self.optimizer.get_size(15))
-        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(self.optimizer.get_spacing(15))
         
         # وضعیت لایسنس
         license_frame = QFrame()
-        license_frame.setStyleSheet(f"background: white; border-radius: 10px; padding: 10px;")
+        license_frame.setStyleSheet(f"""
+            QFrame {{
+                background: {self.theme['card_bg']};
+                border-radius: {self.optimizer.get_margin(10)}px;
+                border: 1px solid {self.theme['border']};
+                padding: {self.optimizer.get_margin(10)}px;
+            }}
+        """)
         license_layout = QHBoxLayout()
         
         if self.license.is_school:
             license_text = "🏫 نسخه مدرسه"
-            color = COLORS['success']
+            color = self.theme['success']
         elif self.license.is_admin:
             license_text = "👑 ادمین"
-            color = COLORS['warning']
+            color = self.theme['warning']
         else:
             license_text = f"🔑 {self.license.license_type.value}"
-            color = COLORS['text_secondary']
+            color = self.theme['text_secondary']
         
         license_label = QLabel(license_text)
-        license_label.setStyleSheet(f"color: {color}; font-weight: bold; font-size: 14px;")
+        license_label.setStyleSheet(f"color: {color}; font-weight: bold; font-size: {self.optimizer.get_font_size(14)}px;")
         license_layout.addWidget(license_label)
         license_layout.addStretch()
         license_frame.setLayout(license_layout)
@@ -1208,51 +1568,91 @@ class DashboardWidget(QWidget):
         
         # کارت‌های آماری
         stats_layout = QHBoxLayout()
-        stats_layout.setSpacing(self.optimizer.get_size(15))
+        stats_layout.setSpacing(self.optimizer.get_spacing(15))
         
-        self.total_card = StatCard("موجودی کل", "۰", "💰", COLORS['secondary'])
+        self.total_card = StatCard(
+            "موجودی کل", "۰", "💰", 
+            self.theme['primary'], self.optimizer, self.theme
+        )
         stats_layout.addWidget(self.total_card)
         
-        self.income_card = StatCard("درآمد امروز", "۰", "📈", COLORS['success'])
+        self.income_card = StatCard(
+            "درآمد امروز", "۰", "📈", 
+            self.theme['success'], self.optimizer, self.theme
+        )
         stats_layout.addWidget(self.income_card)
         
-        self.expense_card = StatCard("هزینه امروز", "۰", "📉", COLORS['danger'])
+        self.expense_card = StatCard(
+            "هزینه امروز", "۰", "📉", 
+            self.theme['danger'], self.optimizer, self.theme
+        )
         stats_layout.addWidget(self.expense_card)
         
         layout.addLayout(stats_layout)
         
-        # دکمه‌های سریع
-        btn_layout = QHBoxLayout()
-        btn_layout.setSpacing(self.optimizer.get_size(10))
+        # دکمه‌ها
+        btn_layout = QGridLayout()
+        btn_layout.setSpacing(self.optimizer.get_spacing(10))
         
-        trans_btn = QPushButton("➕ تراکنش جدید")
-        trans_btn.setFixedHeight(self.optimizer.get_size(40))
-        trans_btn.clicked.connect(self.show_transaction)
-        btn_layout.addWidget(trans_btn)
+        buttons = [
+            ("➕ تراکنش جدید", self.show_transaction, 0, 0, self.theme['success']),
+            ("📊 لیست حساب‌ها", self.show_accounts, 0, 1, self.theme['info']),
+            ("📋 لیست تراکنش‌ها", self.show_transactions, 1, 0, self.theme['warning']),
+            ("🤖 هوش مصنوعی", self.show_ai, 1, 1, self.theme['primary']),
+            ("🔑 لایسنس", self.show_license, 2, 0, self.theme['secondary']),
+            ("ℹ️ درباره", self.show_about, 2, 1, self.theme['secondary'])
+        ]
         
-        accounts_btn = QPushButton("📊 لیست حساب‌ها")
-        accounts_btn.setFixedHeight(self.optimizer.get_size(40))
-        accounts_btn.clicked.connect(self.show_accounts)
-        btn_layout.addWidget(accounts_btn)
-        
-        transactions_btn = QPushButton("📋 لیست تراکنش‌ها")
-        transactions_btn.setFixedHeight(self.optimizer.get_size(40))
-        transactions_btn.clicked.connect(self.show_transactions)
-        btn_layout.addWidget(transactions_btn)
-        
-        plugins_btn = QPushButton("📦 مدیریت پلاگین‌ها")
-        plugins_btn.setFixedHeight(self.optimizer.get_size(40))
-        plugins_btn.clicked.connect(self.show_plugins)
-        btn_layout.addWidget(plugins_btn)
+        for text, func, row, col, color in buttons:
+            btn = QPushButton(text)
+            btn.setFixedHeight(self.optimizer.get_button_height(40))
+            btn.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {color};
+                    color: white;
+                    border: none;
+                    border-radius: {self.optimizer.get_margin(6)}px;
+                    padding: {self.optimizer.get_margin(8)}px;
+                    font-size: {self.optimizer.get_font_size(11)}px;
+                    font-weight: bold;
+                }}
+                QPushButton:hover {{
+                    background-color: {self.theme['hover']};
+                }}
+            """)
+            btn.clicked.connect(func)
+            btn_layout.addWidget(btn, row, col)
         
         layout.addLayout(btn_layout)
         
-        # منطقه ویجت‌های پلاگین
-        self.plugin_area = QVBoxLayout()
-        layout.addLayout(self.plugin_area)
-        
-        # اعمال ویجت‌های پلاگین
-        self.apply_plugin_widgets()
+        # هشدار هوش مصنوعی
+        expenses = [t.amount for t in self.db.get_all_transactions() if t.type == "هزینه"]
+        if expenses and len(expenses) > 5:
+            pred = self.db.predict_next_expense()
+            trend = self.db.trend_analysis()
+            
+            ai_frame = QFrame()
+            ai_frame.setStyleSheet(f"""
+                QFrame {{
+                    background: {self.theme['card_bg']};
+                    border-radius: {self.optimizer.get_margin(8)}px;
+                    border: 1px solid {self.theme['primary']};
+                    padding: {self.optimizer.get_margin(8)}px;
+                }}
+            """)
+            ai_layout = QHBoxLayout()
+            
+            ai_icon = QLabel("🤖")
+            ai_icon.setStyleSheet(f"font-size: {self.optimizer.get_font_size(20)}px;")
+            ai_layout.addWidget(ai_icon)
+            
+            ai_text = QLabel(f"پیش‌بینی ماه آینده: {pred:,.0f} ({trend})")
+            ai_text.setStyleSheet(f"color: {self.theme['primary']}; font-weight: bold;")
+            ai_layout.addWidget(ai_text)
+            
+            ai_layout.addStretch()
+            ai_frame.setLayout(ai_layout)
+            layout.addWidget(ai_frame)
         
         layout.addStretch()
         self.setLayout(layout)
@@ -1266,49 +1666,41 @@ class DashboardWidget(QWidget):
         self.expense_card.update_value(f"{expense:,.0f}")
     
     def show_transaction(self):
-        dialog = TransactionDialog(self.db, self.optimizer, self.window())
+        dialog = TransactionDialog(self.db, self.optimizer, self.theme, self.window())
         if dialog.exec_():
             self.refresh()
     
     def show_accounts(self):
-        dialog = AccountsDialog(self.db, self.optimizer, self.window())
+        dialog = AccountsDialog(self.db, self.optimizer, self.theme, self.window())
         dialog.exec_()
     
     def show_transactions(self):
-        dialog = TransactionsDialog(self.db, self.optimizer, self.window())
+        dialog = TransactionsDialog(self.db, self.optimizer, self.theme, self.window())
         dialog.exec_()
     
-    def show_plugins(self):
-        dialog = PluginManagerDialog(self.plugin_loader, self.optimizer, self.window())
+    def show_ai(self):
+        dialog = AIDashboard(self.db, self.optimizer, self.theme, self.window())
         dialog.exec_()
     
-    def apply_plugin_widgets(self):
-        """اعمال ویجت‌های پلاگین"""
-        for plugin_data in self.plugin_loader.get_all_plugins():
-            plugin = plugin_data['instance']
-            if hasattr(plugin, 'get_dashboard_widgets'):
-                widgets = plugin.get_dashboard_widgets()
-                for widget_info in widgets:
-                    try:
-                        if callable(widget_info):
-                            widget = widget_info(self)
-                            self.plugin_area.addWidget(widget)
-                    except:
-                        pass
+    def show_license(self):
+        dialog = LicenseDialog(self.license, self.optimizer, self.theme, self.window())
+        if dialog.exec_():
+            QMessageBox.information(self.window(), "موفق", "لایسنس فعال شد")
+    
+    def show_about(self):
+        dialog = AboutDialog(self.license, self.optimizer, self.theme, self.window())
+        dialog.exec_()
 
 
-# ====================== پنجره اصلی ======================
+# ====================== کلاس MainWindow ======================
 
 class MainWindow(QMainWindow):
-    """پنجره اصلی برنامه"""
-    
-    def __init__(self, core, db, license_mgr, plugin_loader):
+    def __init__(self, db, license_mgr):
         super().__init__()
-        self.core = core
         self.db = db
         self.license = license_mgr
-        self.plugin_loader = plugin_loader
         self.optimizer = ScreenOptimizer()
+        self.theme_manager = ThemeManager(self.optimizer)
         
         w = self.optimizer.get_size(1200)
         h = self.optimizer.get_size(700)
@@ -1323,16 +1715,29 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(title)
         self.setWindowIcon(self.style().standardIcon(QStyle.SP_ComputerIcon))
         
+        self.apply_theme()
+        
         self.init_ui()
         self.create_menus()
         self.create_toolbar()
         self.create_statusbar()
     
+    def apply_theme(self):
+        self.setStyleSheet(self.theme_manager.get_style())
+    
+    def change_theme(self, theme_name):
+        self.theme_manager.set_theme(theme_name)
+        self.apply_theme()
+        
+        if hasattr(self, 'dashboard'):
+            self.dashboard.theme = self.theme_manager.current_theme
+            self.dashboard.setStyleSheet(f"background-color: {self.theme_manager.current_theme['background']};")
+    
     def init_ui(self):
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
         
-        self.dashboard = DashboardWidget(self.core, self.db, self.license, self.plugin_loader)
+        self.dashboard = DashboardWidget(self.db, self.license, self.theme_manager)
         self.tabs.addTab(self.dashboard, "🏠 داشبورد")
         
         self.tabs.addTab(QWidget(), "📊 گزارشات")
@@ -1343,11 +1748,10 @@ class MainWindow(QMainWindow):
     def create_menus(self):
         menubar = self.menuBar()
         
-        # منوی فایل
         file_menu = menubar.addMenu("فایل")
         
         license_action = QAction("🔑 فعال‌سازی لایسنس", self)
-        license_action.triggered.connect(self.show_license)
+        license_action.triggered.connect(self.dashboard.show_license)
         file_menu.addAction(license_action)
         
         file_menu.addSeparator()
@@ -1357,39 +1761,37 @@ class MainWindow(QMainWindow):
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
         
-        # منوی پلاگین
-        plugin_menu = menubar.addMenu("📦 پلاگین")
+        settings_menu = menubar.addMenu("⚙️ تنظیمات")
         
-        for plugin_data in self.plugin_loader.get_all_plugins():
-            plugin = plugin_data['instance']
-            if hasattr(plugin, 'get_menu_items'):
-                items = plugin.get_menu_items()
-                for item in items:
-                    action = QAction(item['title'], self)
-                    action.triggered.connect(item['callback'])
-                    plugin_menu.addAction(action)
+        theme_menu = settings_menu.addMenu("🎨 تم برنامه")
         
-        plugin_menu.addSeparator()
+        dark_action = QAction("🌙 تم تیره", self)
+        dark_action.triggered.connect(lambda: self.change_theme("dark"))
+        theme_menu.addAction(dark_action)
         
-        manage_action = QAction("📋 مدیریت پلاگین‌ها", self)
-        manage_action.triggered.connect(self.show_plugins)
-        plugin_menu.addAction(manage_action)
+        light_action = QAction("☀️ تم روشن", self)
+        light_action.triggered.connect(lambda: self.change_theme("light"))
+        theme_menu.addAction(light_action)
         
-        # منوی راهنما
+        ai_menu = menubar.addMenu("🤖 هوش مصنوعی")
+        
+        predict_action = QAction("📊 پیش‌بینی هزینه", self)
+        predict_action.triggered.connect(self.dashboard.show_ai)
+        ai_menu.addAction(predict_action)
+        
         help_menu = menubar.addMenu("راهنما")
         
         about_action = QAction("ℹ️ درباره", self)
-        about_action.triggered.connect(self.show_about)
+        about_action.triggered.connect(self.dashboard.show_about)
         help_menu.addAction(about_action)
     
     def create_toolbar(self):
         toolbar = self.addToolBar("ابزارها")
         toolbar.setMovable(False)
         
-        icon_size = self.optimizer.get_size(24)
+        icon_size = self.optimizer.get_icon_size(24)
         toolbar.setIconSize(QSize(icon_size, icon_size))
         
-        # دکمه‌های پیش‌فرض
         trans_btn = QAction("➕", self)
         trans_btn.setToolTip("تراکنش جدید")
         trans_btn.triggered.connect(self.dashboard.show_transaction)
@@ -1405,39 +1807,36 @@ class MainWindow(QMainWindow):
         transactions_btn.triggered.connect(self.dashboard.show_transactions)
         toolbar.addAction(transactions_btn)
         
-        toolbar.addSeparator()
+        ai_btn = QAction("🤖", self)
+        ai_btn.setToolTip("هوش مصنوعی")
+        ai_btn.triggered.connect(self.dashboard.show_ai)
+        toolbar.addAction(ai_btn)
         
-        # دکمه‌های پلاگین
-        for plugin_data in self.plugin_loader.get_all_plugins():
-            plugin = plugin_data['instance']
-            if hasattr(plugin, 'get_toolbar_items'):
-                items = plugin.get_toolbar_items()
-                for item in items:
-                    action = QAction(item['title'], self)
-                    action.triggered.connect(item['callback'])
-                    toolbar.addAction(action)
+        toolbar.addSeparator()
     
     def create_statusbar(self):
         self.statusbar = QStatusBar()
         self.setStatusBar(self.statusbar)
         
+        theme = self.theme_manager.current_theme
+        
         if self.license.is_school:
             status = "🏫 نسخه مدرسه"
-            color = COLORS['success']
+            color = theme['success']
         elif self.license.is_admin:
             status = "👑 ادمین"
-            color = COLORS['warning']
+            color = theme['warning']
         else:
             status = f"🔑 {self.license.license_type.value}"
-            color = COLORS['text_light']
+            color = theme['text_light']
         
         label = QLabel(status)
         label.setStyleSheet(f"color: {color};")
         self.statusbar.addPermanentWidget(label)
         
-        plugin_count = len(self.plugin_loader.get_all_plugins())
-        plugin_label = QLabel(f"📦 {plugin_count} پلاگین")
-        self.statusbar.addPermanentWidget(plugin_label)
+        ai_label = QLabel("🤖 ImanAILight فعال")
+        ai_label.setStyleSheet(f"color: {theme['primary']};")
+        self.statusbar.addPermanentWidget(ai_label)
         
         self.date_label = QLabel()
         self.statusbar.addPermanentWidget(self.date_label)
@@ -1451,31 +1850,6 @@ class MainWindow(QMainWindow):
     def update_status(self):
         now = QDateTime.currentDateTime()
         self.date_label.setText(now.toString("yyyy/MM/dd HH:mm"))
-    
-    def show_license(self):
-        dialog = LicenseDialog(self.license, self.optimizer, self)
-        if dialog.exec_():
-            QMessageBox.information(self, "موفق", "لایسنس فعال شد")
-    
-    def show_plugins(self):
-        dialog = PluginManagerDialog(self.plugin_loader, self.optimizer, self)
-        dialog.exec_()
-    
-    def show_about(self):
-        dialog = AboutDialog(self.license, self.optimizer, self)
-        dialog.exec_()
-
-
-# ====================== کلاس Core ======================
-
-class Core:
-    """هسته اصلی برنامه"""
-    
-    def __init__(self):
-        self.database = DatabaseManager()
-        self.license = LicenseManager()
-        self.plugin_loader = PluginLoader(self)
-        self.current_user = {"name": "کاربر"}
 
 
 # ====================== تابع اصلی ======================
@@ -1483,17 +1857,16 @@ class Core:
 def main():
     app = QApplication(sys.argv)
     
-    core = Core()
+    db = DatabaseManager()
+    license_mgr = LicenseManager()
     
-    # بارگذاری پلاگین‌ها
-    core.plugin_loader.discover_plugins()
-    
-    # نمایش دیالوگ لایسنس
-    if core.license.license_type == LicenseType.FREE and not core.license.is_school:
-        dialog = LicenseDialog(core.license, ScreenOptimizer())
+    if license_mgr.license_type == LicenseType.FREE and not license_mgr.is_school:
+        optimizer = ScreenOptimizer()
+        theme = THEMES["dark"]
+        dialog = LicenseDialog(license_mgr, optimizer, theme)
         dialog.exec_()
     
-    window = MainWindow(core, core.database, core.license, core.plugin_loader)
+    window = MainWindow(db, license_mgr)
     window.show()
     
     sys.exit(app.exec_())
