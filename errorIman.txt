@@ -1,0 +1,30 @@
+
+C:\Users\Iman\Desktop>python "C:\Users\Iman\Desktop\ imanagi.py"
+?? ImanAILite not found - running in basic mode
+
+    +---------------------------------------------------------------+
+    ¦                                                               ¦
+    ¦   ??  IMANAGI v1.0 - Artificial General Intelligence        ¦
+    ¦                                                               ¦
+    ¦   Features:                                                   ¦
+    ¦    Self-awareness & reflection                              ¦
+    ¦    Autonomous goal setting                                  ¦
+    ¦    Memory systems (short/long-term)                         ¦
+    ¦    Emotions & motivations                                   ¦
+    ¦    Self-improvement cycles                                  ¦
+    ¦    Batch learning (train thousands of lessons at once)      ¦
+    ¦                                                               ¦
+    +---------------------------------------------------------------+
+
+Traceback (most recent call last):
+  File "C:\Users\Iman\Desktop\ imanagi.py", line 975, in <module>
+    main()
+  File "C:\Users\Iman\Desktop\ imanagi.py", line 957, in main
+    interactive_mode()
+  File "C:\Users\Iman\Desktop\ imanagi.py", line 856, in interactive_mode
+    agi = ImanAGI("ImanAGI")
+  File "C:\Users\Iman\Desktop\ imanagi.py", line 195, in __init__
+    os.makedirs(model_dir, exist_ok=True)
+NameError: name 'os' is not defined
+
+C:\Users\Iman\Desktop>
