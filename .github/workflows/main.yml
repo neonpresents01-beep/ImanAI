@@ -1,24 +1,243 @@
-name: Create Release
-needs: create-package
-if: startsWith(github.ref, 'refs/tags/')
-runs-on: ubuntu-latest
-steps:
-  - name: دریافت پکیج
-    uses: actions/download-artifact@v4
-    with:
-      name: ImanAccounting-Package-v${{ github.event.inputs.version }}
-      path: ./release
+name: ImanAI Cloud API
+
+on:
+  # از طریق GitHub Actions (برای ارتباط با سایت)
+  repository_dispatch:
+    types: [chat, train, predict, analyze]
   
-  - name: ایجاد Release
-    uses: softprops/action-gh-release@v1
-    with:
-      files: release/*.zip
-      name: ایمان حسابداری نسخه ${{ github.ref_name }}
-      body: |
-        🎉 نسخه جدید منتشر شد!
+  # برای تست دستی
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'نوع عملیات'
+        required: true
+        default: 'chat'
+        type: choice
+        options:
+          - chat
+          - train
+          - status
+      message:
+        description: 'پیام (برای chat)'
+        required: false
+        default: 'سلام'
+
+jobs:
+  ai-service:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 دریافت کد از ریپازیتوری
+        uses: actions/checkout@v4
+      
+      - name: 🐍 نصب پایتون
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: 📦 نصب پیش‌نیازها
+        run: |
+          pip install numpy scipy
+          # اگر نیاز به کتابخونه دیگه‌ای بود اضافه کن
+      
+      - name: 🧠 راه‌اندازی ImanAI و پردازش درخواست
+        env:
+          ACTION_TYPE: ${{ github.event.action }}
+          USER_MESSAGE: ${{ github.event.client_payload.message || github.event.inputs.message }}
+          TRAIN_DATA: ${{ github.event.client_payload.train_data }}
+          REQUEST_ID: ${{ github.event.client_payload.request_id }}
+        run: |
+          python -c "
+import sys, json, urllib.parse, time, hashlib, os
+import numpy as np
+
+# ========== اضافه کردن مسیر ImanAILite ==========
+sys.path.insert(0, '.')
+
+# ========== مدل هوش مصنوعی ImanAI ==========
+class ImanAIModel:
+    """مدل هوش مصنوعی ImanAI - با قابلیت یادگیری"""
+    
+    def __init__(self):
+        self.knowledge = {
+            'سلام': '👋 سلام! من ImanAI هستم، دستیار هوشمند شما.',
+            'خوبی': '🙂 ممنون! من همیشه آماده کمک هستم.',
+            'اسمت': '🤖 اسم من ImanAI هست.',
+            'چه کاری میتونی': self._get_capabilities(),
+            'موجودی صندوق': '💰 موجودی صندوق: ۱۵,۳۲۰,۰۰۰ ریال',
+            'موجودی بانک': '🏦 موجودی بانک: ۸۲,۴۵۰,۰۰۰ ریال',
+            'فروش امروز': '📈 فروش امروز: ۳,۲۰۰,۰۰۰ ریال',
+            'سود و زیان': self._get_profit_loss(),
+            'راهنما': self._get_help(),
+            'خداحافظ': '👋 خداحافظ! خوشحال بودم که تونستم کمک کنم.'
+        }
+        self.conversation_history = []
+        self.model_trained = False
+        self.model_weights = {}
         
-        📥 فایل‌ها:
-        - ImanAccounting_x64.exe (ویندوز ۶۴ بیت)
-        - ImanAccounting_x86.exe (ویندوز ۳۲ بیت)
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # تلاش برای بارگذاری ImanAILite واقعی
+        try:
+            from ImanAILite import ImanAILite
+            self.ai_lite = ImanAILite(verbose=False)
+            self.has_ai_lite = True
+            print('✅ ImanAILite loaded')
+        except Exception as e:
+            print(f'⚠️ ImanAILite not available: {e}')
+            self.has_ai_lite = False
+    
+    def _get_capabilities(self):
+        return """✨ **قابلیت‌های من:**
+
+1. 📊 پاسخ به سوالات مالی
+2. 💰 نمایش موجودی حساب‌ها
+3. 📈 گزارش سود و زیان
+4. 🎤 تشخیص فرمان صوتی
+5. 📚 یادگیری از تعاملات
+
+برای مشاهده راهنما، بگویید «راهنما»"""
+    
+    def _get_profit_loss(self):
+        return """📊 **گزارش سود و زیان**
+
+💰 درآمد کل: ۱۲۵,۰۰۰,۰۰۰ ریال
+💸 هزینه کل: ۸۹,۰۰۰,۰۰۰ ریال
+
+✅ **سود خالص: ۳۶,۰۰۰,۰۰۰ ریال**"""
+    
+    def _get_help(self):
+        return """📚 **راهنمای ImanAI**
+
+**سوالات مالی:**
+• موجودی صندوق
+• موجودی بانک
+• فروش امروز
+• سود و زیان
+
+**سوالات عمومی:**
+• سلام
+• اسمت
+• چه کاری میتونی
+• خداحافظ
+
+💡 می‌توانید سوالات خود را به فارسی بپرسید!"""
+    
+    def train(self, questions, answers):
+        """آموزش مدل با داده‌های جدید"""
+        for q, a in zip(questions, answers):
+            self.knowledge[q.lower()] = a
+        self.model_trained = True
+        return {'status': 'success', 'trained': len(questions)}
+    
+    def chat(self, message):
+        """پاسخ به پیام کاربر"""
+        msg_lower = message.lower().strip()
+        
+        # ذخیره در تاریخچه
+        self.conversation_history.append({
+            'time': time.time(),
+            'user': message,
+            'response': None
+        })
+        
+        # جستجو در دانش
+        for key, response in self.knowledge.items():
+            if key in msg_lower:
+                self.conversation_history[-1]['response'] = response
+                return response
+        
+        # پاسخ پیشفرض
+        response = f"🤖 پیام شما دریافت شد: «{message[:100]}»\n(برای راهنما بگویید «راهنما»)"
+        self.conversation_history[-1]['response'] = response
+        return response
+    
+    def analyze_sentiment(self, text):
+        """تحلیل احساسات متن (ساده)"""
+        positive = ['خوب', 'عالی', 'عشق', 'عالیه', 'ممنون']
+        negative = ['بد', 'خراب', 'اشتباه', 'مشکل', 'ناراحت']
+        
+        text_lower = text.lower()
+        pos_score = sum(1 for w in positive if w in text_lower)
+        neg_score = sum(1 for w in negative if w in text_lower)
+        
+        if pos_score > neg_score:
+            return 'positive', 0.7 + (pos_score * 0.1)
+        elif neg_score > pos_score:
+            return 'negative', 0.6 + (neg_score * 0.1)
+        else:
+            return 'neutral', 0.5
+    
+    def get_stats(self):
+        return {
+            'knowledge_size': len(self.knowledge),
+            'conversations': len(self.conversation_history),
+            'trained': self.model_trained,
+            'has_ai_lite': self.has_ai_lite
+        }
+
+# ========== راه‌اندازی مدل ==========
+ai = ImanAIModel()
+print('🧠 ImanAI Model initialized')
+
+# ========== پردازش درخواست ==========
+action = os.environ.get('ACTION_TYPE', '')
+message = os.environ.get('USER_MESSAGE', '')
+request_id = os.environ.get('REQUEST_ID', str(int(time.time())))
+
+result = {'request_id': request_id, 'timestamp': time.time()}
+
+if action == 'chat':
+    # حالت مکالمه
+    response = ai.chat(message)
+    result['response'] = response
+    result['sentiment'] = ai.analyze_sentiment(message)
+    result['stats'] = ai.get_stats()
+    print(f'RESPONSE::{urllib.parse.quote(json.dumps(result))}')
+
+elif action == 'train':
+    # حالت آموزش
+    train_data = os.environ.get('TRAIN_DATA', '{}')
+    try:
+        data = json.loads(train_data)
+        questions = data.get('questions', [])
+        answers = data.get('answers', [])
+        train_result = ai.train(questions, answers)
+        result['training'] = train_result
+        print(f'RESPONSE::{urllib.parse.quote(json.dumps(result))}')
+    except:
+        result['error'] = 'Invalid training data'
+        print(f'RESPONSE::{urllib.parse.quote(json.dumps(result))}')
+
+elif action == 'status':
+    # حالت وضعیت
+    result['status'] = 'online'
+    result['stats'] = ai.get_stats()
+    print(f'RESPONSE::{urllib.parse.quote(json.dumps(result))}')
+
+elif action == 'analyze':
+    # حالت تحلیل متن
+    sentiment = ai.analyze_sentiment(message)
+    result['sentiment'] = sentiment
+    result['message'] = message[:200]
+    print(f'RESPONSE::{urllib.parse.quote(json.dumps(result))}')
+
+else:
+    result['error'] = f'Unknown action: {action}'
+    result['available_actions'] = ['chat', 'train', 'status', 'analyze']
+    print(f'RESPONSE::{urllib.parse.quote(json.dumps(result))}')
+
+print('✅ Request processed')
+"
+      
+      - name: 📤 برگرداندن پاسخ
+        run: |
+          RESPONSE=$(grep -oP 'RESPONSE::\K.*' <<< "${{ steps.run.outputs.stdout }}" | head -1)
+          echo "response=$RESPONSE" >> $GITHUB_OUTPUT
+          
+          # اگر callback_url وجود داشت، پاسخ رو به اونجا هم بفرست
+          CALLBACK_URL="${{ github.event.client_payload.callback_url }}"
+          if [ -n "$CALLBACK_URL" ]; then
+            curl -X POST "$CALLBACK_URL" \
+              -H "Content-Type: application/json" \
+              -d "{\"request_id\":\"${{ github.event.client_payload.request_id }}\",\"response\":\"$RESPONSE\"}"
+          fi
