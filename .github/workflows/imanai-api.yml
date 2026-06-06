@@ -15,148 +15,22 @@ jobs:
         with:
           python-version: '3.10'
       
-      - name: Run API
+      - name: Run API Handler
         env:
           ACTION: ${{ github.event.action }}
           API_KEY: ${{ github.event.client_payload.api_key }}
-          NAME: ${{ github.event.client_payload.customer_name }}
-          EMAIL: ${{ github.event.client_payload.customer_email }}
-          PLAN: ${{ github.event.client_payload.plan }}
-          MESSAGE: ${{ github.event.client_payload.message }}
-          QUESTION: ${{ github.event.client_payload.question }}
-          ANSWER: ${{ github.event.client_payload.answer }}
-        run: |
-          python << 'EOF'
-import json
-import urllib.parse
-import os
-import hashlib
-import uuid
-import time
-
-USERS_FILE = "users.json"
-KNOWLEDGE_FILE = "knowledge.json"
-
-def load_users():
-    try:
-        with open(USERS_FILE, 'r') as f:
-            return json.load(f)
-    except:
-        return {}
-
-def save_users(users):
-    with open(USERS_FILE, 'w') as f:
-        json.dump(users, f, indent=2)
-
-def load_knowledge():
-    default = {
-        'سلام': '👋 سلام! من ImanAI هستم.',
-        'خوبی': '🙂 ممنون!',
-        'موجودی صندوق': '💰 موجودی صندوق: 15,320,000 ریال',
-        'موجودی بانک': '🏦 موجودی بانک: 82,450,000 ریال'
-    }
-    try:
-        with open(KNOWLEDGE_FILE, 'r') as f:
-            saved = json.load(f)
-            default.update(saved)
-    except:
-        pass
-    return default
-
-def save_knowledge(knowledge):
-    with open(KNOWLEDGE_FILE, 'w') as f:
-        json.dump(knowledge, f, ensure_ascii=False, indent=2)
-
-def hash_key(key):
-    return hashlib.sha256(key.encode()).hexdigest()
-
-def generate_api_key():
-    return f"imanai_{uuid.uuid4().hex[:16]}"
-
-action = os.environ.get('ACTION', '')
-api_key = os.environ.get('API_KEY', '')
-name = os.environ.get('NAME', '')
-email = os.environ.get('EMAIL', '')
-plan = os.environ.get('PLAN', 'free')
-message = os.environ.get('MESSAGE', '')
-question = os.environ.get('QUESTION', '')
-answer = os.environ.get('ANSWER', '')
-
-users = load_users()
-knowledge = load_knowledge()
-result = {}
-
-if action == 'register':
-    new_key = generate_api_key()
-    hashed = hash_key(new_key)
-    users[hashed] = {
-        'name': name, 'email': email, 'plan': plan,
-        'credits': 10000 if plan == 'free' else (100000 if plan == 'basic' else 500000),
-        'created_at': time.time()
-    }
-    save_users(users)
-    result = {'success': True, 'api_key': new_key, 'credits': users[hashed]['credits'], 'plan': plan}
-
-elif action == 'chat':
-    if not api_key:
-        result = {'success': False, 'error': 'API Key required'}
-    else:
-        hashed = hash_key(api_key)
-        if hashed not in users:
-            result = {'success': False, 'error': 'Invalid API Key'}
-        elif users[hashed]['credits'] <= 0:
-            result = {'success': False, 'error': 'Insufficient credits'}
-        else:
-            users[hashed]['credits'] -= 1
-            save_users(users)
-            msg_lower = message.lower()
-            response = None
-            for key, resp in knowledge.items():
-                if key in msg_lower:
-                    response = resp
-                    break
-            if not response:
-                response = f'دریافت شد: {message[:100]}...'
-            result = {'success': True, 'response': response, 'remaining_credits': users[hashed]['credits']}
-
-elif action == 'train':
-    if not api_key:
-        result = {'success': False, 'error': 'API Key required'}
-    else:
-        hashed = hash_key(api_key)
-        if hashed not in users:
-            result = {'success': False, 'error': 'Invalid API Key'}
-        elif users[hashed]['credits'] < 10:
-            result = {'success': False, 'error': 'Insufficient credits'}
-        else:
-            users[hashed]['credits'] -= 10
-            save_users(users)
-            knowledge[question.lower()] = answer
-            save_knowledge(knowledge)
-            result = {'success': True, 'message': f'✅ آموزش شد', 'remaining_credits': users[hashed]['credits']}
-
-elif action == 'balance':
-    if not api_key:
-        result = {'success': False, 'error': 'API Key required'}
-    else:
-        hashed = hash_key(api_key)
-        if hashed not in users:
-            result = {'success': False, 'error': 'Invalid API Key'}
-        else:
-            result = {'success': True, 'credits': users[hashed]['credits'], 'plan': users[hashed]['plan']}
-
-else:
-    result = {'error': f'Unknown: {action}'}
-
-encoded = urllib.parse.quote(json.dumps(result))
-print(f'API_RESPONSE::{encoded}')
-EOF
+          USER_NAME: ${{ github.event.client_payload.customer_name }}
+          USER_EMAIL: ${{ github.event.client_payload.customer_email }}
+          USER_PLAN: ${{ github.event.client_payload.plan }}
+          USER_MESSAGE: ${{ github.event.client_payload.message }}
+          TRAIN_QUESTION: ${{ github.event.client_payload.question }}
+          TRAIN_ANSWER: ${{ github.event.client_payload.answer }}
+        run: python api_handler.py
       
-      - name: Save data
+      - name: Save artifacts
         uses: actions/upload-artifact@v4
         with:
           name: imanai-data
           path: |
             users.json
             knowledge.json
-
