@@ -189,26 +189,42 @@
     }
 
     async function register() {
-        const name = document.getElementById('regName').value;
-        const email = document.getElementById('regEmail').value;
-        const plan = document.getElementById('regPlan').value;
+    const name = document.getElementById('regName').value;
+    const email = document.getElementById('regEmail').value;
+    const plan = document.getElementById('regPlan').value;
+    
+    if (!name || !email) {
+        alert('لطفاً نام و ایمیل را وارد کنید');
+        return;
+    }
+    
+    const btn = event.target;
+    const originalText = btn.innerText;
+    btn.innerText = '⏳ در حال ثبت‌نام...';
+    btn.disabled = true;
+    
+    try {
+        const result = await registerUser(name, email, plan);
         
-        if (!name || !email) {
-            alert('لطفاً نام و ایمیل را وارد کنید');
-            return;
-        }
-        
-        const result = await imanai.register(name, email, plan);
         if (result.success) {
             currentApiKey = result.api_key;
             imanai.setApiKey(currentApiKey);
             updateUI();
-            alert(`✅ ثبت‌نام موفق!\nAPI Key: ${result.api_key}`);
+            alert(`✅ ثبت‌نام موفق!\n\nAPI Key: ${result.api_key}\nاعتبار: ${result.credits?.toLocaleString() || '10,000'} توکن\n\n⚠️ این کلید را ذخیره کنید.`);
+            
+            // پاک کردن فرم
+            document.getElementById('regName').value = '';
+            document.getElementById('regEmail').value = '';
         } else {
             alert(`❌ خطا: ${result.error}`);
         }
+    } catch (error) {
+        alert(`❌ خطا: ${error.message}`);
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
     }
-
+}
     function logout() {
         localStorage.removeItem('imanai_api_key');
         currentApiKey = null;
