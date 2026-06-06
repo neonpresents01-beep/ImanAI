@@ -5,18 +5,15 @@ on:
     types: [register, chat, balance]
 
 jobs:
-  handle-api:
+  api:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
+      - uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      
-      - name: Run API
+      - name: Run
         env:
           ACTION: ${{ github.event.action }}
           API_KEY: ${{ github.event.client_payload.api_key }}
@@ -24,5 +21,4 @@ jobs:
           USER_EMAIL: ${{ github.event.client_payload.customer_email }}
           USER_PLAN: ${{ github.event.client_payload.plan }}
           USER_MESSAGE: ${{ github.event.client_payload.message }}
-        run: |
-          python api_handler.py
+        run: python api_handler.py
