@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ImanAI | حسابداری هوشمند با هوش مصنوعی</title>
+    <title>ImanAI | هوش مصنوعی حسابداری | نرم‌افزار حرفه‌ای</title>
+    <meta name="description" content="نرم‌افزار حسابداری هوشمند ImanAI با قابلیت‌های پیشرفته هوش مصنوعی، انبارداری، حقوق دستمزد و خرید و فروش">
+    <meta name="keywords" content="ImanAI, حسابداری هوشمند, نرم‌افزار حسابداری, انبارداری, حقوق دستمزد">
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -11,30 +13,735 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --card-bg: #ffffff;
+            --navbar-bg: rgba(255,255,255,0.95);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #8b5cf6;
+        }
+
+        body.dark {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: rgba(255,255,255,0.08);
+            --card-bg: #1e293b;
+            --navbar-bg: rgba(15,23,42,0.95);
         }
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            min-height: 100vh;
-            padding: 0;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
 
-        /* حالت روشن (پیش‌فرض) */
-        :root {
-            --bg-primary: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --bg-hero: #f8fafc;
-            --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --navbar-bg: rgba(255, 255, 255, 0.95);
-            --card-bg: #ffffff;
-            --feature-border: #f1f5f9;
-            --shadow: 0 20px 35px -10px rgba(0,0,0,0.1);
-            --shadow-hover: 0 25px 40px -12px rgba(0,0,0,0.15);
+        /* اسکرول بار */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        /* نوار ناوبری */
+        .navbar {
+            background: var(--navbar-bg);
+            backdrop-filter: blur(10px);
+            padding: 16px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            background: rgba(37,99,235,0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* بنر */
+        .hero {
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            border-radius: 32px;
+            padding: 50px;
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        /* بخش‌ها */
+        .section-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* کارت محصولات */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+        }
+
+        .product-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .product-tag {
+            display: inline-block;
+            background: rgba(37,99,235,0.1);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+
+        /* پلن‌های قیمتی */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .pricing-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .popular {
+            border: 2px solid var(--warning);
+            position: relative;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--warning);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .card-header {
+            padding: 25px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .price {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .price small {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .features {
+            list-style: none;
+            padding: 25px;
+        }
+
+        .features li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .features li i {
+            width: 24px;
+        }
+
+        .fa-check-circle { color: var(--success); }
+        .fa-times-circle { color: var(--danger); }
+
+        .btn {
+            display: block;
+            margin: 20px;
+            padding: 12px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        /* بخش چت */
+        .chat-section {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 50px;
+        }
+
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: var(--bg-primary);
+        }
+
+        .user-msg {
+            background: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            max-width: 80%;
+            align-self: flex-end;
+        }
+
+        .ai-msg {
+            background: var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            max-width: 80%;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .chat-input-area button {
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* مانیتورینگ */
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .monitor-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .monitor-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .status-online {
+            color: var(--success);
+        }
+
+        /* تماس با ما */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .contact-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .contact-card i {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        /* فوتر */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            margin-top: 40px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 24px;
+            transition: 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+            }
+            .hero h1 {
+                font-size: 32px;
+            }
+            .hero {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="nav-container">
+        <div class="logo">🤖 ImanAI</div>
+        <div class="nav-links">
+            <a href="#home">خانه</a>
+            <a href="#products">محصولات</a>
+            <a href="#pricing">قیمت‌ها</a>
+            <a href="#ai-chat">ImanAI</a>
+            <a href="#contact">تماس</a>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙 حالت شب</button>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="home">
+    <!-- بنر اصلی -->
+    <div class="hero">
+        <h1>🧠 ImanAI</h1>
+        <p>نرم‌افزار حسابداری هوشمند با قابلیت‌های پیشرفته هوش مصنوعی، انبارداری، حقوق دستمزد و خرید و فروش</p>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">۵,۰۰۰+</div>
+                <div>کاربر فعال</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">۹۹.۹%</div>
+                <div>رضایت مشتری</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">۲۴/۷</div>
+                <div>پشتیبانی</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- محصولات -->
+    <h2 id="products" class="section-title">📦 محصولات ImanAI</h2>
+    <div class="products-grid">
+        <div class="product-card">
+            <div class="product-icon">📘</div>
+            <h3>ImanAILite</h3>
+            <p>نسخه سبک و سریع برای کسب‌وکارهای کوچک. امکانات پایه حسابداری و انبارداری.</p>
+            <span class="product-tag">مناسب شروع کار</span>
+        </div>
+        <div class="product-card">
+            <div class="product-icon">📊</div>
+            <h3>ImanAccount</h3>
+            <p>نسخه کامل حسابداری حرفه‌ای با ماژول‌های خرید و فروش، حقوق دستمزد و گزارشات پیشرفته.</p>
+            <span class="product-tag">انتخاب هوشمندانه</span>
+        </div>
+        <div class="product-card">
+            <div class="product-icon">🧠</div>
+            <h3>ImanAI Core</h3>
+            <p>هسته هوش مصنوعی اختصاصی با قابلیت یادگیری عمیق، تشخیص گفتار و تحلیل داده.</p>
+            <span class="product-tag">فناوری انحصاری</span>
+        </div>
+    </div>
+
+    <!-- قیمت‌ها -->
+    <h2 id="pricing" class="section-title">💰 پلن‌های قیمتی</h2>
+    <div class="pricing-grid">
+        <div class="pricing-card">
+            <div class="card-header">
+                <h3>📦 رایگان</h3>
+                <div class="price">۰ <small>تومان</small></div>
+            </div>
+            <ul class="features">
+                <li><i class="fas fa-check-circle"></i> حسابداری پایه</li>
+                <li><i class="fas fa-check-circle"></i> انبارداری (۵۰ کالا)</li>
+                <li><i class="fas fa-times-circle"></i> حقوق دستمزد</li>
+                <li><i class="fas fa-times-circle"></i> خرید و فروش</li>
+                <li><i class="fas fa-times-circle"></i> هوش مصنوعی</li>
+            </ul>
+            <a href="#" class="btn" onclick="alert('دانلود نسخه رایگان از طریق پشتیبانی')">شروع رایگان</a>
+        </div>
+        <div class="pricing-card">
+            <div class="card-header">
+                <h3>📋 پایه</h3>
+                <div class="price">۵۰۰,۰۰۰ <small>تومان</small></div>
+            </div>
+            <ul class="features">
+                <li><i class="fas fa-check-circle"></i> حسابداری کامل</li>
+                <li><i class="fas fa-check-circle"></i> انبارداری نامحدود</li>
+                <li><i class="fas fa-times-circle"></i> حقوق دستمزد</li>
+                <li><i class="fas fa-times-circle"></i> خرید و فروش</li>
+                <li><i class="fas fa-times-circle"></i> هوش مصنوعی</li>
+            </ul>
+            <a href="#" class="btn" onclick="alert('خرید پلن پایه - مبلغ: ۵۰۰,۰۰۰ تومان')">خرید پایه</a>
+        </div>
+        <div class="pricing-card popular">
+            <div class="popular-badge">🔥 محبوب</div>
+            <div class="card-header">
+                <h3>⚡ حرفه‌ای</h3>
+                <div class="price">۲,۷۰۰,۰۰۰ <small>تومان</small></div>
+            </div>
+            <ul class="features">
+                <li><i class="fas fa-check-circle"></i> حسابداری کامل</li>
+                <li><i class="fas fa-check-circle"></i> انبارداری نامحدود</li>
+                <li><i class="fas fa-check-circle"></i> حقوق دستمزد</li>
+                <li><i class="fas fa-check-circle"></i> خرید و فروش</li>
+                <li><i class="fas fa-times-circle"></i> هوش مصنوعی</li>
+            </ul>
+            <a href="#" class="btn" onclick="alert('خرید پلن حرفه‌ای - مبلغ: ۲,۷۰۰,۰۰۰ تومان')">خرید حرفه‌ای</a>
+        </div>
+        <div class="pricing-card">
+            <div class="card-header">
+                <h3>💎 کامل</h3>
+                <div class="price">۱۰,۰۰۰,۰۰۰ <small>تومان</small></div>
+            </div>
+            <ul class="features">
+                <li><i class="fas fa-check-circle"></i> همه امکانات پلن حرفه‌ای</li>
+                <li><i class="fas fa-check-circle"></i> هوش مصنوعی ImanAI</li>
+                <li><i class="fas fa-check-circle"></i> دستیار صوتی آفلاین</li>
+                <li><i class="fas fa-check-circle"></i> پشتیبانی ۱ ساله</li>
+                <li><i class="fas fa-check-circle"></i> API دسترسی</li>
+            </ul>
+            <a href="#" class="btn" onclick="alert('خرید پلن کامل - مبلغ: ۱۰,۰۰۰,۰۰۰ تومان')">خرید کامل</a>
+        </div>
+    </div>
+
+    <!-- چت با ImanAI -->
+    <h2 id="ai-chat" class="section-title">💬 گفتگو با ImanAI</h2>
+    <div class="chat-section">
+        <div class="chat-messages" id="chatMessages">
+            <div class="ai-msg">🤖 سلام! من ImanAI هستم. چطور می‌توانم به شما کمک کنم؟</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="سوال خود را بپرسید...">
+            <button onclick="sendMessage()">ارسال</button>
+        </div>
+    </div>
+
+    <!-- مانیتورینگ -->
+    <h2 class="section-title">📊 وضعیت سرویس‌ها</h2>
+    <div class="monitoring-grid">
+        <div class="monitor-card">
+            <i class="fas fa-server" style="font-size: 32px; color: var(--primary);"></i>
+            <div class="monitor-value" id="uptime">۹۹.۹%</div>
+            <p>Uptime</p>
+            <span class="status-online">✅ آنلاین</span>
+        </div>
+        <div class="monitor-card">
+            <i class="fas fa-microchip" style="font-size: 32px; color: var(--primary);"></i>
+            <div class="monitor-value" id="aiStatus">فعال</div>
+            <p>وضعیت ImanAI</p>
+        </div>
+        <div class="monitor-card">
+            <i class="fas fa-users" style="font-size: 32px; color: var(--primary);"></i>
+            <div class="monitor-value" id="users">۵,۰۰۰+</div>
+            <p>کاربران فعال</p>
+        </div>
+    </div>
+
+    <!-- تماس با ما -->
+    <h2 id="contact" class="section-title">📞 تماس با ما</h2>
+    <div class="contact-grid">
+        <div class="contact-card">
+            <i class="fas fa-phone-alt"></i>
+            <h3>تلفن پشتیبانی</h3>
+            <p dir="ltr">۰۹۹۳۷۰۶۰۴۴۷</p>
+            <button class="btn" style="margin: 10px auto 0; width: auto; display: inline-block;" onclick="copyPhone()">📋 کپی</button>
+        </div>
+        <div class="contact-card">
+            <i class="fas fa-credit-card"></i>
+            <h3>شماره کارت</h3>
+            <p dir="ltr">۵۸۹۲ ۱۰۱۷ ۳۰۸۲ ۸۸۳۳</p>
+            <button class="btn" style="margin: 10px auto 0; width: auto; display: inline-block;" onclick="copyCard()">📋 کپی</button>
+        </div>
+        <div class="contact-card">
+            <i class="fab fa-telegram"></i>
+            <h3>پشتیبانی تلگرام</h3>
+            <p>@ImanAI_support</p>
+            <a href="https://t.me/ImanAI_support" target="_blank" class="btn" style="margin: 10px auto 0; width: auto; display: inline-block; text-decoration: none;">ارسال پیام</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="social-links">
+            <a href="#"><i class="fab fa-telegram"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+        </div>
+        <p>© ۲۰۲۶ ImanAI - سامانه حسابداری هوشمند | تمامی حقوق محفوظ است</p>
+        <p style="margin-top: 10px; font-size: 12px;">🤖 مجهز به هوش مصنوعی اختصاصی ImanAI</p>
+    </div>
+</div>
+
+<script src="imanai-client.js"></script>
+<script>
+    // ========== توابع کمکی ==========
+    function copyCard() {
+        navigator.clipboard.writeText('5892101730828833');
+        alert('✅ شماره کارت کپی شد!');
+    }
+
+    function copyPhone() {
+        navigator.clipboard.writeText('09937060447');
+        alert('✅ شماره تماس کپی شد!');
+    }
+
+    // ========== حالت روز/شب ==========
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        const btn = document.querySelector('.theme-toggle');
+        btn.innerHTML = document.body.classList.contains('dark') ? '☀️ حالت روز' : '🌙 حالت شب';
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark');
+        document.querySelector('.theme-toggle').innerHTML = '☀️ حالت روز';
+    }
+
+    // ========== چت با ImanAI ==========
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+
+    function addMessage(sender, text) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = sender === 'user' ? 'user-msg' : 'ai-msg';
+        messageDiv.innerHTML = sender === 'user' ? `👤 شما: ${text}` : `🤖 ImanAI: ${text}`;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        addMessage('user', message);
+        chatInput.value = '';
+
+        try {
+            const result = await imanai.chat(message);
+            if (result.response) {
+                addMessage('ai', result.response);
+            } else {
+                addMessage('ai', 'متاسفانه پاسخی دریافت نشد. لطفاً دوباره تلاش کنید.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            addMessage('ai', `❌ خطا: ${error.message}`);
+        }
+    }
+
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // ========== مانیتورینگ ==========
+    async function updateStatus() {
+        try {
+            const status = await imanai.getStatus();
+            if (status && status.status === 'online') {
+                document.getElementById('aiStatus').innerHTML = 'فعال';
+                document.getElementById('aiStatus').style.color = 'var(--success)';
+            }
+        } catch (error) {
+            document.getElementById('aiStatus').innerHTML = 'در حال بررسی';
+        }
+    }
+
+    updateStatus();
+    setInterval(updateStatus, 30000);
+</script>
+
+</body>
+</html>            --shadow-hover: 0 25px 40px -12px rgba(0,0,0,0.15);
         }
 
         /* حالت تیره */
