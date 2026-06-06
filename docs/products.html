@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImanAI | محصولات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo">🤖 ImanAI</a>
+        <div class="nav-links">
+            <a href="index.html">خانه</a>
+            <a href="products.html" class="active">محصولات</a>
+            <a href="pricing.html">قیمت‌ها</a>
+            <a href="about.html">درباره ما</a>
+            <a href="contact.html">تماس</a>
+            <a href="dashboard.html">پنل کاربری</a>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙 حالت شب</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-header">
+        <h1>📦 محصولات ImanAI</h1>
+        <p>راه‌حل‌های هوشمند برای کسب‌وکار شما</p>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <div class="product-icon" style="font-size: 64px; text-align: center;">📘</div>
+            <h2 style="text-align: center; margin: 15px 0;">ImanAILite</h2>
+            <p>نسخه سبک و سریع برای کسب‌وکارهای کوچک و شروع کار</p>
+            <ul style="margin: 20px 0; list-style: none;">
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> حسابداری پایه</li>
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> انبارداری (۵۰ کالا)</li>
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> گزارشات ساده</li>
+                <li style="margin: 10px 0;"><i class="fas fa-times-circle" style="color: var(--danger);"></i> حقوق دستمزد</li>
+                <li style="margin: 10px 0;"><i class="fas fa-times-circle" style="color: var(--danger);"></i> خرید و فروش</li>
+            </ul>
+            <a href="pricing.html" class="btn" style="display: block; text-align: center;">مشاهده قیمت</a>
+        </div>
+
+        <div class="card">
+            <div class="product-icon" style="font-size: 64px; text-align: center;">📊</div>
+            <h2 style="text-align: center; margin: 15px 0;">ImanAccount</h2>
+            <p>نسخه کامل حسابداری حرفه‌ای برای شرکت‌های متوسط</p>
+            <ul style="margin: 20px 0; list-style: none;">
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> حسابداری کامل</li>
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> انبارداری نامحدود</li>
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> حقوق دستمزد</li>
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> خرید و فروش</li>
+                <li style="margin: 10px 0;"><i class="fas fa-times-circle" style="color: var(--danger);"></i> هوش مصنوعی</li>
+            </ul>
+            <a href="pricing.html" class="btn" style="display: block; text-align: center;">مشاهده قیمت</a>
+        </div>
+
+        <div class="card">
+            <div class="product-icon" style="font-size: 64px; text-align: center;">🧠</div>
+            <h2 style="text-align: center; margin: 15px 0;">ImanAI Core</h2>
+            <p>هسته هوش مصنوعی اختصاصی ImanAI</p>
+            <ul style="margin: 20px 0; list-style: none;">
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> پردازش زبان طبیعی</li>
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> تشخیص گفتار آفلاین</li>
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> تحلیل داده</li>
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> آموزش مدل</li>
+                <li style="margin: 10px 0;"><i class="fas fa-check-circle" style="color: var(--success);"></i> API دسترسی</li>
+            </ul>
+            <a href="pricing.html" class="btn" style="display: block; text-align: center;">مشاهده قیمت</a>
+        </div>
+    </div>
+
+    <!-- مقایسه -->
+    <div class="card" style="margin-top: 40px;">
+        <h2 style="text-align: center; margin-bottom: 30px;">📊 مقایسه محصولات</h2>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: var(--border-color);">
+                        <th style="padding: 12px; text-align: center;">ویژگی</th>
+                        <th style="padding: 12px; text-align: center;">ImanAILite</th>
+                        <th style="padding: 12px; text-align: center;">ImanAccount</th>
+                        <th style="padding: 12px; text-align: center;">ImanAI Core</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="padding: 10px;">حسابداری</td><td style="text-align: center;">✅</td><td style="text-align: center;">✅</td><td style="text-align: center;">-</td></tr>
+                    <tr><td style="padding: 10px;">انبارداری</td><td style="text-align: center;">✅</td><td style="text-align: center;">✅</td><td style="text-align: center;">-</td></tr>
+                    <tr><td style="padding: 10px;">حقوق دستمزد</td><td style="text-align: center;">❌</td><td style="text-align: center;">✅</td><td style="text-align: center;">-</td></tr>
+                    <tr><td style="padding: 10px;">خرید و فروش</td><td style="text-align: center;">❌</td><td style="text-align: center;">✅</td><td style="text-align: center;">-</td></tr>
+                    <tr><td style="padding: 10px;">هوش مصنوعی</td><td style="text-align: center;">❌</td><td style="text-align: center;">❌</td><td style="text-align: center;">✅</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>© ۲۰۲۶ ImanAI - سامانه حسابداری هوشمند</p>
+</div>
+
+<script src="imanai-client.js"></script>
+<script>
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        const btn = document.querySelector('.theme-toggle');
+        if (btn) btn.innerHTML = document.body.classList.contains('dark') ? '☀️ حالت روز' : '🌙 حالت شب';
+    }
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark');
+        const btn = document.querySelector('.theme-toggle');
+        if (btn) btn.innerHTML = '☀️ حالت روز';
+    }
+</script>
+</body>
+</html>
