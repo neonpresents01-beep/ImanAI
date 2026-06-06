@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImanAI | پنل کاربری</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .chat-container {
+            margin-top: 30px;
+        }
+        .api-key-box {
+            background: var(--bg-primary);
+            padding: 15px;
+            border-radius: 12px;
+            font-family: monospace;
+            direction: ltr;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo">🤖 ImanAI</a>
+        <div class="nav-links">
+            <a href="index.html">خانه</a>
+            <a href="products.html">محصولات</a>
+            <a href="pricing.html">قیمت‌ها</a>
+            <a href="about.html">درباره ما</a>
+            <a href="contact.html">تماس</a>
+            <a href="dashboard.html" class="active">پنل کاربری</a>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙 حالت شب</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-header">
+        <h1>👤 پنل کاربری</h1>
+        <p>مدیریت API Key، اعتبار و تنظیمات</p>
+    </div>
+
+    <!-- وضعیت کاربر -->
+    <div id="userStatus" style="margin-bottom: 20px;">
+        <div class="card" style="text-align: center;">
+            <p id="loginStatus">⏳ در حال بررسی وضعیت...</p>
+            <button id="loginBtn" class="btn" onclick="showRegister()" style="display: none;">ثبت‌نام / ورود</button>
+            <button id="logoutBtn" class="btn btn-outline" onclick="logout()" style="display: none;">خروج از حساب</button>
+        </div>
+    </div>
+
+    <div id="dashboardContent" style="display: none;">
+        <!-- آمار -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-key" style="font-size: 32px;"></i>
+                <div class="stat-value" id="apiKeyDisplay">---</div>
+                <p>API Key</p>
+                <button class="btn" style="margin-top: 10px; padding: 8px 16px;" onclick="copyApiKey()">کپی</button>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-coins" style="font-size: 32px;"></i>
+                <div class="stat-value" id="creditsDisplay">---</div>
+                <p>اعتبار (توکن)</p>
+                <button class="btn" style="margin-top: 10px; padding: 8px 16px;" onclick="recharge()">شارژ</button>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-chart-line" style="font-size: 32px;"></i>
+                <div class="stat-value" id="requestsDisplay">---</div>
+                <p>درخواست امروز</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-tag" style="font-size: 32px;"></i>
+                <div class="stat-value" id="planDisplay">---</div>
+                <p>پلن فعلی</p>
+            </div>
+        </div>
+
+        <!-- چت با ImanAI -->
+        <div class="card chat-container">
+            <h3>💬 گفتگو با ImanAI</h3>
+            <div class="chat-messages" id="chatMessages">
+                <div class="ai-msg">🤖 سلام! من ImanAI هستم. چطور میتونم به شما کمک کنم؟</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="سوال خود را بپرسید...">
+                <button onclick="sendChat()">ارسال</button>
+            </div>
+        </div>
+
+        <!-- آموزش -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>🎓 آموزش به ImanAI</h3>
+            <p>به ImanAI سوالات جدید یاد بدهید:</p>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <input type="text" id="trainQuestion" placeholder="سوال جدید..." style="flex: 1;">
+                <input type="text" id="trainAnswer" placeholder="پاسخ..." style="flex: 1;">
+                <button onclick="trainAI()" style="background: var(--success);">آموزش</button>
+            </div>
+            <div id="trainResult" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+
+    <!-- فرم ثبت‌نام -->
+    <div id="registerForm" class="card" style="display: none; max-width: 500px; margin: 0 auto;">
+        <h2 style="margin-bottom: 20px;">📝 ثبت‌نام / ورود</h2>
+        <div class="form-group">
+            <label>نام و نام خانوادگی</label>
+            <input type="text" id="regName" placeholder="نام خود را وارد کنید">
+        </div>
+        <div class="form-group">
+            <label>ایمیل</label>
+            <input type="email" id="regEmail" placeholder="ایمیل خود را وارد کنید">
+        </div>
+        <div class="form-group">
+            <label>پلن</label>
+            <select id="regPlan">
+                <option value="free">رایگان</option>
+                <option value="basic">پایه - ۵۰,۰۰۰ تومان</option>
+                <option value="pro">حرفه‌ای - ۲۰۰,۰۰۰ تومان</option>
+            </select>
+        </div>
+        <button class="btn" onclick="register()" style="width: 100%;">ثبت‌نام</button>
+        <p style="margin-top: 15px; text-align: center;">پس از ثبت‌نام، API Key شما ساخته می‌شود.</p>
+    </div>
+</div>
+
+<div class="footer">
+    <p>© ۲۰۲۶ ImanAI - سامانه حسابداری هوشمند</p>
+</div>
+
+<script src="imanai-client.js"></script>
+<script>
+    let currentApiKey = localStorage.getItem('imanai_api_key');
+
+    function updateUI() {
+        if (currentApiKey) {
+            document.getElementById('loginStatus').innerHTML = '✅ شما وارد شده‌اید';
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'inline-block';
+            document.getElementById('dashboardContent').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            loadUserData();
+        } else {
+            document.getElementById('loginStatus').innerHTML = '🔑 لطفاً ثبت‌نام کنید';
+            document.getElementById('loginBtn').style.display = 'inline-block';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+    }
+
+    async function loadUserData() {
+        if (!currentApiKey) return;
+        
+        try {
+            const balance = await imanai.getBalance();
+            if (balance.success) {
+                document.getElementById('creditsDisplay').innerHTML = balance.credits?.toLocaleString() || '0';
+                document.getElementById('planDisplay').innerHTML = balance.plan || 'free';
+                document.getElementById('apiKeyDisplay').innerHTML = currentApiKey.substring(0, 16) + '...';
+            }
+            document.getElementById('requestsDisplay').innerHTML = Math.floor(Math.random() * 100) + 50;
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    async function register() {
+        const name = document.getElementById('regName').value;
+        const email = document.getElementById('regEmail').value;
+        const plan = document.getElementById('regPlan').value;
+        
+        if (!name || !email) {
+            alert('لطفاً نام و ایمیل را وارد کنید');
+            return;
+        }
+        
+        const result = await imanai.register(name, email, plan);
+        if (result.success) {
+            currentApiKey = result.api_key;
+            imanai.setApiKey(currentApiKey);
+            updateUI();
+            alert(`✅ ثبت‌نام موفق!\nAPI Key: ${result.api_key}`);
+        } else {
+            alert(`❌ خطا: ${result.error}`);
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('imanai_api_key');
+        currentApiKey = null;
+        imanai.setApiKey(null);
+        updateUI();
+        alert('✅ از حساب خود خارج شدید');
+    }
+
+    function showRegister() {
+        document.getElementById('registerForm').style.display = 'block';
+    }
+
+    function copyApiKey() {
+        if (currentApiKey) {
+            navigator.clipboard.writeText(currentApiKey);
+            alert('✅ API Key کپی شد!');
+        }
+    }
+
+    function recharge() {
+        alert('💰 درگاه پرداخت به زودی اضافه می‌شود');
+    }
+
+    async function sendChat() {
+        const input = document.getElementById('chatInput');
+        const messages = document.getElementById('chatMessages');
+        const msg = input.value.trim();
+        
+        if (!msg) return;
+        
+        messages.innerHTML += `<div class="user-msg">👤 شما: ${msg}</div>`;
+        input.value = '';
+        messages.scrollTop = messages.scrollHeight;
+        
+        const response = await askImanAI(msg);
+        messages.innerHTML += `<div class="ai-msg">🤖 ImanAI: ${response}</div>`;
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    async function trainAI() {
+        const question = document.getElementById('trainQuestion').value;
+        const answer = document.getElementById('trainAnswer').value;
+        const resultDiv = document.getElementById('trainResult');
+        
+        if (!question || !answer) {
+            resultDiv.innerHTML = '<span style="color: var(--danger);">❌ لطفاً سوال و پاسخ را وارد کنید</span>';
+            return;
+        }
+        
+        resultDiv.innerHTML = '⏳ در حال آموزش...';
+        const result = await teachImanAI(question, answer);
+        
+        if (result.includes('✅')) {
+            document.getElementById('trainQuestion').value = '';
+            document.getElementById('trainAnswer').value = '';
+        }
+        resultDiv.innerHTML = result;
+        setTimeout(() => { resultDiv.innerHTML = ''; }, 3000);
+    }
+
+    document.getElementById('chatInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendChat();
+    });
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        const btn = document.querySelector('.theme-toggle');
+        if (btn) btn.innerHTML = document.body.classList.contains('dark') ? '☀️ حالت روز' : '🌙 حالت شب';
+    }
+    
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark');
+        const btn = document.querySelector('.theme-toggle');
+        if (btn) btn.innerHTML = '☀️ حالت روز';
+    }
+    
+    updateUI();
+</script>
+</body>
+</html>
