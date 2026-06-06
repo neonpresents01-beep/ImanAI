@@ -2,20 +2,21 @@ name: ImanAI API
 
 on:
   repository_dispatch:
-    types: [register, chat, train, balance]
+    types: [register, chat, balance]
 
 jobs:
-  api:
+  handle-api:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       
-      - name: Run API Handler
+      - name: Run API
         env:
           ACTION: ${{ github.event.action }}
           API_KEY: ${{ github.event.client_payload.api_key }}
@@ -23,14 +24,5 @@ jobs:
           USER_EMAIL: ${{ github.event.client_payload.customer_email }}
           USER_PLAN: ${{ github.event.client_payload.plan }}
           USER_MESSAGE: ${{ github.event.client_payload.message }}
-          TRAIN_QUESTION: ${{ github.event.client_payload.question }}
-          TRAIN_ANSWER: ${{ github.event.client_payload.answer }}
-        run: python api_handler.py
-      
-      - name: Save artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: imanai-data
-          path: |
-            users.json
-            knowledge.json
+        run: |
+          python api_handler.py
