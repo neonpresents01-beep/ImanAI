@@ -1,4 +1,4 @@
-// imanai-client.js - برای استفاده در imanai.ir
+// ImanAI Client - نسخه کامل
 const GITHUB_REPO = "neonpresents01-beep/ImanAI";
 const GITHUB_TOKEN = "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";
 
@@ -13,7 +13,7 @@ class ImanAIClient {
         return new Promise(async (resolve, reject) => {
             const timeout = setTimeout(() => {
                 this.pendingRequests.delete(requestId);
-                reject(new Error('Timeout (30s)'));
+                reject(new Error('زمان پاسخ به پایان رسید (30 ثانیه)'));
             }, 30000);
             
             this.pendingRequests.set(requestId, { resolve, reject, timeout });
@@ -33,7 +33,7 @@ class ImanAIClient {
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 this._pollResponse(requestId);
@@ -48,25 +48,28 @@ class ImanAIClient {
     
     async _pollResponse(requestId) {
         let attempts = 0;
-        const maxAttempts = 15;
+        const maxAttempts = 20;
         
         const interval = setInterval(async () => {
             attempts++;
             
             try {
-                const runs = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/actions/runs?event=repository_dispatch&per_page=3`);
-                const data = await runs.json();
+                const runsRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/actions/runs?event=repository_dispatch&per_page=5`);
+                const runs = await runsRes.json();
                 
-                for (const run of (data.workflow_runs || [])) {
+                for (const run of (runs.workflow_runs || [])) {
                     if (run.status === 'completed') {
-                        const logs = await fetch(run.logs_url);
-                        const logText = await logs.text();
+                        const logsRes = await fetch(run.logs_url);
+                        const logText = await logsRes.text();
                         const match = logText.match(/IMANAI_RESPONSE::(.+)/);
                         
                         if (match) {
                             try {
                                 const result = JSON.parse(decodeURIComponent(match[1]));
                                 const pending = this.pendingRequests.get(requestId);
+                                if (pending && result.request_id !== requestId) {
+                                    continue;
+                                }
                                 if (pending) {
                                     clearInterval(interval);
                                     clearTimeout(pending.timeout);
@@ -84,21 +87,23 @@ class ImanAIClient {
                     const pending = this.pendingRequests.get(requestId);
                     if (pending) {
                         this.pendingRequests.delete(requestId);
-                        pending.reject(new Error('No response'));
+                        pending.reject(new Error('پاسخی از سرور دریافت نشد'));
                     }
                 }
             } catch (error) {
-                console.error('Poll error:', error);
+                console.error('خطا در بررسی پاسخ:', error);
             }
         }, 2000);
     }
+    
+    // ========== API های عمومی ==========
     
     async chat(message) {
         return this._call('chat', { message });
     }
     
-    async analyze(text) {
-        return this._call('analyze', { text });
+    async train(question, answer) {
+        return this._call('train', { question, answer });
     }
     
     async getStatus() {
@@ -106,56 +111,46 @@ class ImanAIClient {
     }
 }
 
-// ایجاد نمونه
+// ایجاد نمونه سراسری
 const imanai = new ImanAIClient();
 
-// تابع برای استفاده در سایت
+// ========== توابع کمکی برای استفاده در سایت ==========
+
 async function askImanAI(message) {
     try {
         const result = await imanai.chat(message);
-        if (result.response) {
+        if (result.success) {
             return result.response;
         }
-        return 'متاسفانه پاسخی دریافت نشد.';
+        return result.response || 'پاسخی دریافت نشد';
     } catch (error) {
         console.error('Error:', error);
         return `❌ خطا: ${error.message}`;
     }
 }
 
-// تابع برای نمایش در صفحه
-async function sendToImanAI() {
-    const input = document.getElementById('ai-input');
-    const output = document.getElementById('ai-output');
-    
-    if (!input || !input.value.trim()) return;
-    
-    const userMessage = input.value;
-    
-    if (output) {
-        output.innerHTML += `<div class="user-msg">👤 شما: ${userMessage}</div>`;
+async function teachImanAI(question, answer) {
+    try {
+        const result = await imanai.train(question, answer);
+        if (result.success) {
+            return result.message;
+        }
+        return `❌ ${result.error}`;
+    } catch (error) {
+        return `❌ خطا: ${error.message}`;
     }
-    
-    const response = await askImanAI(userMessage);
-    
-    if (output) {
-        output.innerHTML += `<div class="ai-msg">🤖 ImanAI: ${response}</div>`;
-        output.scrollTop = output.scrollHeight;
-    }
-    
-    if (input) input.value = '';
 }
 
-// بررسی وضعیت
-async function checkAIStatus() {
+async function checkImanAIStatus() {
     try {
         const status = await imanai.getStatus();
-        console.log('ImanAI Status:', status);
         return status.status === 'online';
     } catch {
         return false;
     }
 }
 
-// اجرای خودکار بررسی وضعیت
-checkAIStatus();
+// بررسی وضعیت در شروع
+checkImanAIStatus().then(online => {
+    console.log('ImanAI status:', online ? '✅ آنلاین' : '❌ آفلاین');
+});
