@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مستندات ImanAILite | کتابخانه هوش مصنوعی بومی ایران</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0a0f1f 0%, #0f172a 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        /* هدر */
+        .header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #e94560;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #e94560;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #4CAF50;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .nav a:hover {
+            color: #e94560;
+        }
+
+        /* کانتینر اصلی */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        /* سایدبار */
+        .sidebar {
+            width: 280px;
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #334155;
+        }
+
+        .sidebar-title {
+            color: #e94560;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            color: #94a3b8;
+            text-decoration: none;
+            display: block;
+            padding: 0.4rem 0.5rem;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: #334155;
+            color: #e94560;
+        }
+
+        /* محتوای اصلی */
+        .content {
+            flex: 1;
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid #334155;
+        }
+
+        .content h1 {
+            color: #e94560;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            border-right: 4px solid #e94560;
+            padding-right: 1rem;
+        }
+
+        .content h2 {
+            color: #4CAF50;
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .content h3 {
+            color: #e2e8f0;
+            margin: 1rem 0;
+        }
+
+        .content p {
+            margin-bottom: 1rem;
+        }
+
+        /* کد بلوک‌ها */
+        pre {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid #334155;
+        }
+
+        code {
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            color: #4CAF50;
+        }
+
+        /* نکات و هشدارها */
+        .note {
+            background: #1e3a5f;
+            border-right: 4px solid #e94560;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .warning {
+            background: #3b2e1e;
+            border-right: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .success {
+            background: #1e3a2e;
+            border-right: 4px solid #4CAF50;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        /* دکمه‌ها */
+        .btn {
+            display: inline-block;
+            background: #e94560;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 0.5rem;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #c62a40;
+        }
+
+        /* فوتر */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid #334155;
+            margin-top: 2rem;
+            color: #64748b;
+        }
+
+        /* ریسپانسیو */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                position: static;
+            }
+            .header-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- هدر -->
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">Iman<span>AI</span></a>
+            <nav class="nav">
+                <a href="/">خانه</a>
+                <a href="/docs">مستندات</a>
+                <a href="/blog">وبلاگ</a>
+                <a href="/about">درباره ما</a>
+                <a href="/contact">تماس</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- محتوای اصلی -->
+    <div class="container">
+        <!-- سایدبار -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">📚 شروع کنید</div>
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active">معرفی</a></li>
+                    <li><a href="#">نصب</a></li>
+                    <li><a href="#">شروع سریع</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">🧠 آموزش‌ها</div>
+                <ul class="sidebar-menu">
+                    <li><a href="#">طبقه‌بندی (Classification)</a></li>
+                    <li><a href="#">رگرسیون (Regression)</a></li>
+                    <li><a href="#">LSTM برای سری زمانی</a></li>
+                    <li><a href="#">Transformer</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">📖 API Reference</div>
+                <ul class="sidebar-menu">
+                    <li><a href="#">لایه‌ها (Layers)</a></li>
+                    <li><a href="#">مدل‌ها (Models)</a></li>
+                    <li><a href="#">بهینه‌سازها (Optimizers)</a></li>
+                    <li><a href="#">توابع فعال‌سازی</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">🔧 منابع</div>
+                <ul class="sidebar-menu">
+                    <li><a href="#">مثال‌ها (Examples)</a></li>
+                    <li><a href="#">مشارکت</a></li>
+                    <li><a href="#">تغییرات (Changelog)</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- محتوای اصلی -->
+        <main class="content">
+            <h1>🤖 ImanAILite</h1>
+            <p><strong>کتابخانه هوش مصنوعی سبک، بومی و بدون وابستگی برای پایتون</strong></p>
+
+            <div class="success">
+                ✅ <strong>نسخه ۱.۰ منتشر شد!</strong> ۳۰ تست موفق، پایدار روی 32-bit
+            </div>
+
+            <h2>✨ ویژگی‌ها</h2>
+            <ul>
+                <li>✅ <strong>بدون وابستگی</strong> - فقط NumPy (و CuPy اختیاری برای GPU)</li>
+                <li>✅ <strong>سبک</strong> - حجم ~۱۰ مگابایت</li>
+                <li>✅ <strong>سازگار با 32-bit</strong> - روی ویندوز ۷ اجرا می‌شود</li>
+                <li>✅ <strong>کامل</strong> - Dense, LSTM, CNN, Attention, Transformer</li>
+                <li>✅ <strong>بومی</strong> - کد از صفر نوشته شده، کاملاً ایرانی</li>
+            </ul>
+
+            <h2>🚀 نصب سریع</h2>
+            <pre><code>pip install ImanAILite</code></pre>
+
+            <div class="note">
+                💡 <strong>نکته:</strong> برای استفاده از GPU، CuPy را نصب کنید:
+                <pre><code>pip install cupy-cuda11x</code></pre>
+            </div>
+
+            <h2>📖 مثال سریع</h2>
+            <pre><code>from ImanAILite import ImanAILite
+import numpy as np
+
+ai = ImanAILite()
+
+# ایجاد مدل
+model = ai.create_classifier("my_model", input_dim=10, num_classes=2)
+
+# داده نمونه
+X = np.random.randn(100, 10)
+y = (np.sum(X, axis=1) > 0).astype(int)
+
+# آموزش
+ai.train("my_model", X, y, epochs=10, batch_size=16)
+
+# پیش‌بینی
+predictions = ai.predict("my_model", X[:5])
+print(predictions)</code></pre>
+
+            <h2>📊 آمار و عملکرد</h2>
+            <ul>
+                <li>✅ ۳۰ تست موفق از ۳۰ تست</li>
+                <li>✅ پوشش ۱۰۰% لایه‌های اصلی</li>
+                <li>✅ بدون خطا روی ویندوز ۷ 32-bit</li>
+            </ul>
+
+            <h2>🎯 لایه‌های موجود</h2>
+            <ul>
+                <li><code>Dense</code> - لایه fully-connected</li>
+                <li><code>LSTM</code> - حافظه بلندمدت</li>
+                <li><code>Conv2D</code> - لایه کانولوشن</li>
+                <li><code>Attention</code> - مکانیزم توجه</li>
+                <li><code>Dropout</code> - جلوگیری از overfitting</li>
+                <li><code>BatchNorm</code> - نرمال‌سازی دسته‌ای</li>
+                <li><code>Flatten</code> - صاف کردن</li>
+                <li><code>Embedding</code> - تبدیل کلمات به بردار</li>
+            </ul>
+
+            <h2>📞 تماس و پشتیبانی</h2>
+            <p>📧 ایمیل: <strong>info@imanai.ir</strong></p>
+            <p>💬 تلگرام: <strong>@ImanAI_support</strong></p>
+            <p>🌐 وبسایت: <strong>imanai.ir</strong></p>
+
+            <a href="#" class="btn">مشاهده مثال‌های بیشتر →</a>
+        </main>
+    </div>
+
+    <!-- فوتر -->
+    <footer class="footer">
+        <p>© 2025 ImanAI. تمامی حقوق محفوظ است.</p>
+        <p>ساخته شده با ❤️ در ایران</p>
+    </footer>
+
+</body>
+</html>
