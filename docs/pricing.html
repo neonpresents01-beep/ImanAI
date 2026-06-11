@@ -20,7 +20,7 @@
             position: absolute;
             top: -10px;
             right: 20px;
-            background: var(--warning);
+            background: #f59e0b;
             color: white;
             padding: 5px 15px;
             border-radius: 50px;
@@ -36,6 +36,12 @@
         .price small {
             font-size: 14px;
             color: var(--text-dim);
+        }
+        .price-period {
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-top: -15px;
+            margin-bottom: 15px;
         }
         .feature-list {
             list-style: none;
@@ -65,7 +71,7 @@
         }
         .pricing-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
             margin: 40px 0;
         }
@@ -76,6 +82,14 @@
             background: var(--surface);
             border-radius: 12px;
             color: var(--text-dim);
+        }
+        .badge-year {
+            background: #4CAF50;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -100,33 +114,36 @@
 <div class="container">
     <div class="page-header">
         <h1>💰 قیمت‌های منصفانه</h1>
-        <p>پرداخت یکباره، بدون هزینه اشتراک ماهانه</p>
+        <p>لایسنس یکساله | پرداخت سالانه | تمدید با ۳۰٪ تخفیف</p>
     </div>
 
     <div class="pricing-container">
         
-        <!-- پکیج پایه - ۱ میلیون -->
+        <!-- پکیج پایه - ۱ میلیون در سال -->
         <div class="card pricing-card">
             <h3>📊 پایه</h3>
             <div class="price">۱,۰۰۰,۰۰۰ <small>تومان</small></div>
+            <div class="price-period">سالانه</div>
             <p>مناسب برای کسب‌وکارهای کوچک و تازه‌کار</p>
             <ul class="feature-list">
                 <li><i class="fas fa-check-circle"></i> حسابداری کامل (اسناد، دفتر روزنامه، تراز)</li>
                 <li><i class="fas fa-check-circle"></i> انبارداری پایه</li>
                 <li><i class="fas fa-check-circle"></i> تا ۵۰۰ سند حسابداری</li>
                 <li><i class="fas fa-check-circle"></i> تا ۱۰۰ کالا در انبار</li>
-                <li><i class="fas fa-check-circle"></i> ۳۰ روز پشتیبانی رایگان</li>
+                <li><i class="fas fa-check-circle"></i> پشتیبانی ۳۰ روزه</li>
                 <li><i class="fas fa-times-circle" style="color: var(--text-dim);"></i> ماژول حقوق دستمزد</li>
                 <li><i class="fas fa-times-circle" style="color: var(--text-dim);"></i> هوش مصنوعی ImanAI</li>
             </ul>
-            <a href="#" class="btn">خرید پایه</a>
+            <a href="#" class="btn">خرید اشتراک پایه</a>
+            <p style="font-size: 12px; color: var(--text-dim); margin-top: 10px;">تمدید سال بعد: ۷۰۰,۰۰۰ تومان</p>
         </div>
 
-        <!-- پکیج حرفه‌ای - ۲.۷ میلیون (محبوب) -->
+        <!-- پکیج حرفه‌ای - ۲.۷ میلیون در سال (محبوب) -->
         <div class="card pricing-card">
             <div class="popular-badge">⭐ محبوب‌ترین</div>
             <h3>⚡ حرفه‌ای</h3>
             <div class="price">۲,۷۰۰,۰۰۰ <small>تومان</small></div>
+            <div class="price-period">سالانه</div>
             <p>مناسب برای کسب‌وکارهای متوسط و رو به رشد</p>
             <ul class="feature-list">
                 <li><i class="fas fa-check-circle"></i> همه امکانات نسخه پایه</li>
@@ -138,13 +155,15 @@
                 <li><i class="fas fa-check-circle"></i> گزارشات پیشرفته و داشبورد</li>
                 <li><i class="fas fa-check-circle"></i> ۶ ماه پشتیبانی رایگان</li>
             </ul>
-            <a href="#" class="btn">خرید حرفه‌ای</a>
+            <a href="#" class="btn">خرید اشتراک حرفه‌ای</a>
+            <p style="font-size: 12px; color: var(--text-dim); margin-top: 10px;">تمدید سال بعد: ۱,۸۹۰,۰۰۰ تومان</p>
         </div>
 
-        <!-- پکیج سازمانی - ۷ میلیون -->
+        <!-- پکیج سازمانی - ۷ میلیون در سال -->
         <div class="card pricing-card">
             <h3>🏢 سازمانی</h3>
             <div class="price">۷,۰۰۰,۰۰۰ <small>تومان</small></div>
+            <div class="price-period">سالانه</div>
             <p>مناسب برای شرکت‌های بزرگ و سازمان‌ها</p>
             <ul class="feature-list">
                 <li><i class="fas fa-check-circle"></i> همه امکانات نسخه حرفه‌ای</li>
@@ -157,15 +176,34 @@
                 <li><i class="fas fa-check-circle"></i> یک سال پشتیبانی ۲۴/۷</li>
             </ul>
             <a href="#" class="btn">تماس با فروش</a>
+            <p style="font-size: 12px; color: var(--text-dim); margin-top: 10px;">تمدید سال بعد: ۴,۹۰۰,۰۰۰ تومان</p>
         </div>
 
+    </div>
+
+    <!-- لایسنس ماهانه (اختیاری) -->
+    <div class="card" style="margin-top: 20px;">
+        <h3 style="text-align: center;">📅 لایسنس ماهانه (برای شروع آسان)</h3>
+        <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 20px;">
+            <div style="text-align: center;">
+                <h4>پایه</h4>
+                <p style="font-size: 24px; color: var(--primary);">۱۲۰,۰۰۰ <small style="font-size: 14px;">تومان/ماه</small></p>
+                <a href="#" class="btn-outline" style="display: inline-block; padding: 8px 20px; border-radius: 8px;">شروع</a>
+            </div>
+            <div style="text-align: center;">
+                <h4>حرفه‌ای</h4>
+                <p style="font-size: 24px; color: var(--primary);">۲۵۰,۰۰۰ <small style="font-size: 14px;">تومان/ماه</small></p>
+                <a href="#" class="btn-outline" style="display: inline-block; padding: 8px 20px; border-radius: 8px;">شروع</a>
+            </div>
+        </div>
+        <p style="text-align: center; color: var(--text-dim); margin-top: 15px;">💡 لایسنس سالانه = ۲ ماه رایگان نسبت به ماهانه</p>
     </div>
 
     <!-- نکات اضافی -->
     <div class="note">
         <i class="fas fa-shield-alt" style="margin-left: 8px;"></i>
-        <strong>پرداخت یکباره، مالکیت دائمی</strong><br>
-        بدون هزینه اشتراک ماهانه. پس از خرید، لایسنس دائمی دریافت می‌کنید.
+        <strong>لایسنس یکساله، قابل تمدید</strong><br>
+        پس از اتمام سال، با ۳۰٪ تخفیف می‌توانید تمدید کنید. همچنین امکان تغییر پلن در هر زمان وجود دارد.
         <br><br>
         <i class="fas fa-tag" style="margin-left: 8px;"></i>
         <strong>تخفیف ویژه استارتاپ‌ها و مراکز آموزشی</strong> - با ما تماس بگیرید.
@@ -176,31 +214,58 @@
 
     <!-- مقایسه با رقبا -->
     <div class="card" style="margin-top: 40px;">
-        <h3 style="text-align: center;">📊 مقایسه قیمت ImanAI با رقبا</h3>
+        <h3 style="text-align: center;">📊 مقایسه ImanAI با رقبا</h3>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 20px; text-align: center;">
             <div style="padding: 15px;">
                 <h4 style="color: var(--primary);">ImanAI</h4>
-                <p><strong>۱ تا ۷ میلیون</strong></p>
+                <p><strong>۱ تا ۷ میلیون <small>/سال</small></strong></p>
                 <p style="color: var(--secondary);">✅ هوش مصنوعی اختصاصی</p>
-                <p style="color: var(--secondary);">✅ پرداخت یکباره</p>
+                <p style="color: var(--secondary);">✅ بدون دونگل</p>
+                <p style="color: var(--secondary);">✅ حجم ۴۵ مگابایت</p>
             </div>
             <div style="padding: 15px; background: var(--surface); border-radius: 12px;">
                 <h4 style="color: #888;">هلو</h4>
-                <p><strong>۵ تا ۱۵ میلیون</strong></p>
+                <p><strong>۵ تا ۱۵ میلیون <small>/دائمی</small></strong></p>
                 <p style="color: #f44336;">❌ بدون هوش مصنوعی</p>
-                <p style="color: #f44336;">❌ دونگل سخت‌افزاری</p>
+                <p style="color: #f44336;">❌ نیاز به دونگل</p>
+                <p style="color: #f44336;">❌ حجم ۱.۳GB</p>
             </div>
             <div style="padding: 15px; background: var(--surface); border-radius: 12px;">
                 <h4 style="color: #888;">محک</h4>
-                <p><strong>۴ تا ۱۲ میلیون</strong></p>
+                <p><strong>۴ تا ۱۲ میلیون <small>/دائمی</small></strong></p>
                 <p style="color: #f44336;">❌ بدون هوش مصنوعی</p>
-                <p style="color: #f44336;">❌ حجم بالا (۱GB+)</p>
+                <p style="color: #f44336;">❌ حجم بالا</p>
+                <p style="color: #f44336;">❌ وابستگی به سخت‌افزار</p>
             </div>
             <div style="padding: 15px; background: var(--surface); border-radius: 12px;">
                 <h4 style="color: #888;">سپیدار</h4>
-                <p><strong>۳ تا ۸ میلیون</strong></p>
+                <p><strong>۳ تا ۸ میلیون <small>/دائمی</small></strong></p>
                 <p style="color: #f44336;">❌ بدون هوش مصنوعی</p>
-                <p style="color: #f44336;">❌ محدودیت در تعداد فاکتور</p>
+                <p style="color: #f44336;">❌ محدودیت فاکتور</p>
+                <p style="color: #f44336;">❌ پشتیبانی محدود</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- سوالات متداول -->
+    <div class="card" style="margin-top: 40px;">
+        <h3 style="text-align: center;">❓ سوالات متداول</h3>
+        <div style="margin-top: 20px;">
+            <div style="margin-bottom: 15px;">
+                <h4>🔹 لایسنس بعد از یک سال چه می‌شود؟</h4>
+                <p>نرم‌افزار قفل می‌شود و فقط می‌توانید داده‌های خود را مشاهده کنید. برای ادامه کار، لایسنس را تمدید کنید.</p>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <h4>🔹 آیا می‌توانم پلن خود را تغییر دهم؟</h4>
+                <p>بله، در هر زمان می‌توانید به پلن بالاتر ارتقا دهید (تفاوت قیمت را پرداخت می‌کنید).</p>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <h4>🔹 پشتیبانی چگونه است؟</h4>
+                <p>پشتیبانی از طریق تلفن، ایمیل و تلگرام. ساعات پاسخگویی ۹ صبح تا ۵ عصر (به جز تعطیلات رسمی).</p>
+            </div>
+            <div>
+                <h4>🔹 آیا داده‌های ما محفوظ است؟</h4>
+                <p>بله. نرم‌افزار کاملاً آفلاین است و داده‌ها روی سیستم خودتان ذخیره می‌شود.</p>
             </div>
         </div>
     </div>
@@ -223,4 +288,4 @@
 </script>
 
 </body>
-</html>
+    </html>
