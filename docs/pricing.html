@@ -11,6 +11,10 @@
         .pricing-card {
             text-align: center;
             position: relative;
+            transition: transform 0.3s;
+        }
+        .pricing-card:hover {
+            transform: translateY(-10px);
         }
         .popular-badge {
             position: absolute;
@@ -21,6 +25,7 @@
             padding: 5px 15px;
             border-radius: 50px;
             font-size: 12px;
+            font-weight: bold;
         }
         .price {
             font-size: 36px;
@@ -30,14 +35,47 @@
         }
         .price small {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: var(--text-dim);
         }
         .feature-list {
             list-style: none;
+            padding: 0;
             margin: 20px 0;
+            text-align: right;
         }
         .feature-list li {
             padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feature-list i {
+            color: var(--secondary);
+            width: 20px;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .pricing-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        .note {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--surface);
+            border-radius: 12px;
+            color: var(--text-dim);
         }
     </style>
 </head>
@@ -48,6 +86,7 @@
         <a href="index.html" class="logo">🤖 ImanAI</a>
         <div class="nav-links">
             <a href="index.html">خانه</a>
+            <a href="docs.html">📚 مستندات</a>
             <a href="products.html">محصولات</a>
             <a href="pricing.html" class="active">قیمت‌ها</a>
             <a href="about.html">درباره ما</a>
@@ -60,110 +99,128 @@
 
 <div class="container">
     <div class="page-header">
-        <h1>💰 پلن‌های قیمتی</h1>
-        <p>پلن مناسب خود را انتخاب کنید و امروز شروع کنید</p>
+        <h1>💰 قیمت‌های منصفانه</h1>
+        <p>پرداخت یکباره، بدون هزینه اشتراک ماهانه</p>
     </div>
 
-    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-        <!-- پلن رایگان -->
+    <div class="pricing-container">
+        
+        <!-- پکیج پایه - ۱ میلیون -->
         <div class="card pricing-card">
-            <h3>📦 رایگان</h3>
-            <div class="price">۰ <small>تومان</small></div>
-            <p>مناسب برای شروع و تست</p>
+            <h3>📊 پایه</h3>
+            <div class="price">۱,۰۰۰,۰۰۰ <small>تومان</small></div>
+            <p>مناسب برای کسب‌وکارهای کوچک و تازه‌کار</p>
             <ul class="feature-list">
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> ۱۰۰ درخواست/روز</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> ۱۰,۰۰۰ توکن ماهانه</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> پشتیبانی عمومی</li>
-                <li><i class="fas fa-times-circle" style="color: var(--danger);"></i> آموزش مدل</li>
-                <li><i class="fas fa-times-circle" style="color: var(--danger);"></i> API اختصاصی</li>
+                <li><i class="fas fa-check-circle"></i> حسابداری کامل (اسناد، دفتر روزنامه، تراز)</li>
+                <li><i class="fas fa-check-circle"></i> انبارداری پایه</li>
+                <li><i class="fas fa-check-circle"></i> تا ۵۰۰ سند حسابداری</li>
+                <li><i class="fas fa-check-circle"></i> تا ۱۰۰ کالا در انبار</li>
+                <li><i class="fas fa-check-circle"></i> ۳۰ روز پشتیبانی رایگان</li>
+                <li><i class="fas fa-times-circle" style="color: var(--text-dim);"></i> ماژول حقوق دستمزد</li>
+                <li><i class="fas fa-times-circle" style="color: var(--text-dim);"></i> هوش مصنوعی ImanAI</li>
             </ul>
-            <a href="register.html" class="btn">شروع رایگان</a>
+            <a href="#" class="btn">خرید پایه</a>
         </div>
 
-        <!-- پلن پایه -->
+        <!-- پکیج حرفه‌ای - ۲.۷ میلیون (محبوب) -->
         <div class="card pricing-card">
-            <h3>📋 پایه</h3>
-            <div class="price">۵۰,۰۰۰ <small>تومان/ماه</small></div>
-            <p>مناسب فروشگاه‌های کوچک</p>
-            <ul class="feature-list">
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> ۱,۰۰۰ درخواست/روز</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> ۱۰۰,۰۰۰ توکن ماهانه</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> پشتیبانی優先</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> آموزش مدل</li>
-                <li><i class="fas fa-times-circle" style="color: var(--danger);"></i> API اختصاصی</li>
-            </ul>
-            <a href="#" class="btn" onclick="alert('خرید پلن پایه - ۵۰,۰۰۰ تومان')">خرید پایه</a>
-        </div>
-
-        <!-- پلن حرفه‌ای -->
-        <div class="card pricing-card" style="border: 2px solid var(--warning);">
-            <div class="popular-badge">🔥 محبوب</div>
+            <div class="popular-badge">⭐ محبوب‌ترین</div>
             <h3>⚡ حرفه‌ای</h3>
-            <div class="price">۲۰۰,۰۰۰ <small>تومان/ماه</small></div>
-            <p>مناسب شرکت‌های متوسط</p>
+            <div class="price">۲,۷۰۰,۰۰۰ <small>تومان</small></div>
+            <p>مناسب برای کسب‌وکارهای متوسط و رو به رشد</p>
             <ul class="feature-list">
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> ۵,۰۰۰ درخواست/روز</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> ۵۰۰,۰۰۰ توکن ماهانه</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> پشتیبانی ۲۴/۷</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> آموزش مدل</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> API اختصاصی</li>
+                <li><i class="fas fa-check-circle"></i> همه امکانات نسخه پایه</li>
+                <li><i class="fas fa-check-circle"></i> نامحدود سند حسابداری</li>
+                <li><i class="fas fa-check-circle"></i> نامحدود کالا در انبار</li>
+                <li><i class="fas fa-check-circle"></i> ماژول حقوق دستمزد کامل</li>
+                <li><i class="fas fa-check-circle"></i> فاکتور فروش و خرید</li>
+                <li><i class="fas fa-check-circle"></i> 🧠 دستیار هوشمند ImanAI</li>
+                <li><i class="fas fa-check-circle"></i> گزارشات پیشرفته و داشبورد</li>
+                <li><i class="fas fa-check-circle"></i> ۶ ماه پشتیبانی رایگان</li>
             </ul>
-            <a href="#" class="btn" onclick="alert('خرید پلن حرفه‌ای - ۲۰۰,۰۰۰ تومان')">خرید حرفه‌ای</a>
+            <a href="#" class="btn">خرید حرفه‌ای</a>
         </div>
 
-        <!-- پلن سازمانی -->
+        <!-- پکیج سازمانی - ۷ میلیون -->
         <div class="card pricing-card">
             <h3>🏢 سازمانی</h3>
-            <div class="price">تماس بگیرید</div>
-            <p>مناسب سازمان‌های بزرگ</p>
+            <div class="price">۷,۰۰۰,۰۰۰ <small>تومان</small></div>
+            <p>مناسب برای شرکت‌های بزرگ و سازمان‌ها</p>
             <ul class="feature-list">
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> نامحدود</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> سرور اختصاصی</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> پشتیبانی ویژه</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> مدل سفارشی</li>
-                <li><i class="fas fa-check-circle" style="color: var(--success);"></i> SLA ۹۹.۹%</li>
+                <li><i class="fas fa-check-circle"></i> همه امکانات نسخه حرفه‌ای</li>
+                <li><i class="fas fa-check-circle"></i> تعداد کاربر: نامحدود</li>
+                <li><i class="fas fa-check-circle"></i> پشتیبانی اختصاصی</li>
+                <li><i class="fas fa-check-circle"></i> سرور داخلی (اختیاری)</li>
+                <li><i class="fas fa-check-circle"></i> شخصی‌سازی مطابق نیاز سازمان</li>
+                <li><i class="fas fa-check-circle"></i> سیستم پلاگین سفارشی</li>
+                <li><i class="fas fa-check-circle"></i> آموزش رایگان کارکنان</li>
+                <li><i class="fas fa-check-circle"></i> یک سال پشتیبانی ۲۴/۷</li>
             </ul>
-            <a href="contact.html" class="btn">تماس با ما</a>
+            <a href="#" class="btn">تماس با فروش</a>
+        </div>
+
+    </div>
+
+    <!-- نکات اضافی -->
+    <div class="note">
+        <i class="fas fa-shield-alt" style="margin-left: 8px;"></i>
+        <strong>پرداخت یکباره، مالکیت دائمی</strong><br>
+        بدون هزینه اشتراک ماهانه. پس از خرید، لایسنس دائمی دریافت می‌کنید.
+        <br><br>
+        <i class="fas fa-tag" style="margin-left: 8px;"></i>
+        <strong>تخفیف ویژه استارتاپ‌ها و مراکز آموزشی</strong> - با ما تماس بگیرید.
+        <br><br>
+        <i class="fas fa-credit-card" style="margin-left: 8px;"></i>
+        <strong>امکان پرداخت اقساطی</strong> - تا ۱۲ ماه بدون کارمزد.
+    </div>
+
+    <!-- مقایسه با رقبا -->
+    <div class="card" style="margin-top: 40px;">
+        <h3 style="text-align: center;">📊 مقایسه قیمت ImanAI با رقبا</h3>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 20px; text-align: center;">
+            <div style="padding: 15px;">
+                <h4 style="color: var(--primary);">ImanAI</h4>
+                <p><strong>۱ تا ۷ میلیون</strong></p>
+                <p style="color: var(--secondary);">✅ هوش مصنوعی اختصاصی</p>
+                <p style="color: var(--secondary);">✅ پرداخت یکباره</p>
+            </div>
+            <div style="padding: 15px; background: var(--surface); border-radius: 12px;">
+                <h4 style="color: #888;">هلو</h4>
+                <p><strong>۵ تا ۱۵ میلیون</strong></p>
+                <p style="color: #f44336;">❌ بدون هوش مصنوعی</p>
+                <p style="color: #f44336;">❌ دونگل سخت‌افزاری</p>
+            </div>
+            <div style="padding: 15px; background: var(--surface); border-radius: 12px;">
+                <h4 style="color: #888;">محک</h4>
+                <p><strong>۴ تا ۱۲ میلیون</strong></p>
+                <p style="color: #f44336;">❌ بدون هوش مصنوعی</p>
+                <p style="color: #f44336;">❌ حجم بالا (۱GB+)</p>
+            </div>
+            <div style="padding: 15px; background: var(--surface); border-radius: 12px;">
+                <h4 style="color: #888;">سپیدار</h4>
+                <p><strong>۳ تا ۸ میلیون</strong></p>
+                <p style="color: #f44336;">❌ بدون هوش مصنوعی</p>
+                <p style="color: #f44336;">❌ محدودیت در تعداد فاکتور</p>
+            </div>
         </div>
     </div>
 
-    <!-- سوالات متداول -->
-    <div class="card" style="margin-top: 40px;">
-        <h2 style="text-align: center; margin-bottom: 30px;">❓ سوالات متداول</h2>
-        <div style="display: grid; gap: 20px;">
-            <div>
-                <h3>چطور می‌توانم API Key دریافت کنم؟</h3>
-                <p>پس از ثبت‌نام در پنل کاربری، API Key مخصوص شما ساخته می‌شود.</p>
-            </div>
-            <div>
-                <h3>چطور اعتبار خود را افزایش دهم؟</h3>
-                <p>از طریق پنل کاربری می‌توانید اعتبار خود را به صورت آنلاین شارژ کنید.</p>
-            </div>
-            <div>
-                <h3>آیا می‌توانم مدل را آموزش دهم؟</h3>
-                <p>بله، در پلن‌های پایه به بالا می‌توانید سوالات جدید به ImanAI یاد بدهید.</p>
-            </div>
-        </div>
-    </div>
 </div>
 
 <div class="footer">
-    <p>© ۲۰۲۶ ImanAI - سامانه حسابداری هوشمند</p>
+    <p>© 2025 ImanAI - تمامی حقوق محفوظ است</p>
+    <p style="margin-top: 10px;">
+        <a href="docs.html" style="color: var(--primary); text-decoration: none;">مستندات</a> |
+        <a href="#" style="color: var(--primary); text-decoration: none;">بلاگ</a> |
+        <a href="contact.html" style="color: var(--primary); text-decoration: none;">تماس با ما</a>
+    </p>
 </div>
 
-<script src="imanai-client.js"></script>
 <script>
     function toggleTheme() {
-        document.body.classList.toggle('dark');
-        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-        const btn = document.querySelector('.theme-toggle');
-        if (btn) btn.innerHTML = document.body.classList.contains('dark') ? '☀️ حالت روز' : '🌙 حالت شب';
-    }
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark');
-        const btn = document.querySelector('.theme-toggle');
-        if (btn) btn.innerHTML = '☀️ حالت روز';
+        document.body.classList.toggle('dark-mode');
     }
 </script>
+
 </body>
 </html>
