@@ -1,7 +1,7 @@
 // imanai-client.js - نسخه کامل برای پنل کاربری
 
 const GITHUB_REPO = "neonpresents01-beep/ImanAI";
-const GITHUB_TOKEN = "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";
+const GITHUB_TOKEN = "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";
 
 let currentApiKey = localStorage.getItem('imanai_api_key');
 
