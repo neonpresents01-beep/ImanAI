@@ -1,0 +1,33 @@
+name: ImanAI API
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [register, chat, balance]
+
+jobs:
+  handle:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    
+    - name: Install ImanAILite
+      run: pip install ImanAILite
+    
+    - name: Process
+      run: echo "API Ready"
+    
+    - name: Commit
+      run: |
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git add . || echo "No changes"
+        git commit -m "Update" || echo "No changes"
+        git push || echo "No push"
