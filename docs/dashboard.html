@@ -6,26 +6,32 @@
     <style>
         body { font-family: Tahoma; background: #0f172a; color: white; padding: 20px; }
         .card { background: #1e293b; padding: 20px; border-radius: 16px; margin-bottom: 20px; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: none; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: none; background: #334155; color: white; }
         button { background: #2563eb; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; }
         .result { margin-top: 10px; padding: 10px; border-radius: 8px; }
         .success { background: #10b981; }
         .error { background: #ef4444; }
+        #chatMessages { height: 300px; overflow-y: auto; background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div style="max-width: 500px; margin: 0 auto;">
-    <h1>👤 پنل کاربری ImanAI</h1>
+<div style="max-width: 600px; margin: 0 auto;">
+    <h1>🤖 ImanAI - پنل کاربری</h1>
+    
+    <!-- وضعیت API -->
+    <div id="apiStatus" style="background: #334155; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+        🔄 در حال اتصال به سرویس...
+    </div>
 
     <div id="registerBox" class="card">
         <h3>📝 ثبت‌نام</h3>
         <input type="text" id="name" placeholder="نام">
         <input type="email" id="email" placeholder="ایمیل">
         <select id="plan">
-            <option value="free">رایگان</option>
-            <option value="basic">پایه</option>
-            <option value="pro">حرفه‌ای</option>
+            <option value="free">رایگان (100 اعتبار)</option>
+            <option value="basic">پایه (500 اعتبار)</option>
+            <option value="pro">حرفه‌ای (2000 اعتبار)</option>
         </select>
         <button onclick="register()">✅ ثبت‌نام</button>
         <div id="registerResult"></div>
@@ -33,15 +39,16 @@
 
     <div id="dashboardBox" class="card" style="display: none;">
         <h3>🔑 API Key شما</h3>
-        <p id="apiKeyDisplay" style="font-family: monospace; word-break: break-all;"></p>
+        <p id="apiKeyDisplay" style="font-family: monospace; word-break: break-all; background: #0f172a; padding: 10px; border-radius: 8px;"></p>
         <button onclick="copyApiKey()">📋 کپی</button>
         
-        <h3>💰 اعتبار</h3>
-        <p id="creditsDisplay">0</p>
+        <h3>💰 اعتبار باقی‌مانده</h3>
+        <p id="creditsDisplay" style="font-size: 24px; font-weight: bold; color: #10b981;">0</p>
+        <p>پلن: <span id="planDisplay">-</span></p>
         
         <h3>💬 چت با ImanAI</h3>
-        <div id="chatMessages" style="height: 200px; overflow-y: auto; background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-            <div>🤖 سلام!</div>
+        <div id="chatMessages">
+            <div>🤖 سلام! من ImanAI هستم. سوال خود را بپرسید.</div>
         </div>
         <input type="text" id="chatInput" placeholder="سوال خود را بپرسید...">
         <button onclick="sendChat()">ارسال</button>
@@ -50,124 +57,6 @@
     </div>
 </div>
 
-<script>
-    const GITHUB_REPO = "neonpresents01-beep/ImanAI";
-    const GITHUB_TOKEN = "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";
-    
-    let currentApiKey = localStorage.getItem('imanai_api_key');
-    
-    async function callAPI(action, payload = {}) {
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/dispatches`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ event_type: action, client_payload: { ...payload, api_key: currentApiKey || '' } })
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        
-        for (let i = 0; i < 15; i++) {
-            await new Promise(r => setTimeout(r, 2000));
-            const runs = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/actions/runs?per_page=3`);
-            const data = await runs.json();
-            for (const run of (data.workflow_runs || [])) {
-                if (run.status === 'completed') {
-                    const logs = await fetch(run.logs_url);
-                    const text = await logs.text();
-                    const match = text.match(/API_RESPONSE::(.+)/);
-                    if (match) {
-                        return JSON.parse(decodeURIComponent(match[1]));
-                    }
-                }
-            }
-        }
-        throw new Error('Timeout');
-    }
-    
-    async function register() {
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const plan = document.getElementById('plan').value;
-        const resultDiv = document.getElementById('registerResult');
-        
-        if (!name || !email) {
-            resultDiv.innerHTML = '<div class="result error">❌ نام و ایمیل الزامی است</div>';
-            return;
-        }
-        
-        resultDiv.innerHTML = '<div>⏳ در حال ثبت‌نام...</div>';
-        
-        try {
-            const result = await callAPI('register', { customer_name: name, customer_email: email, plan });
-            if (result.success) {
-                currentApiKey = result.api_key;
-                localStorage.setItem('imanai_api_key', currentApiKey);
-                resultDiv.innerHTML = '<div class="result success">✅ ثبت‌نام موفق!</div>';
-                location.reload();
-            } else {
-                resultDiv.innerHTML = `<div class="result error">❌ ${result.error}</div>`;
-            }
-        } catch(e) {
-            resultDiv.innerHTML = `<div class="result error">❌ خطا: ${e.message}</div>`;
-        }
-    }
-    
-    async function sendChat() {
-        const input = document.getElementById('chatInput');
-        const msg = input.value.trim();
-        if (!msg) return;
-        
-        const messages = document.getElementById('chatMessages');
-        messages.innerHTML += `<div>👤 شما: ${msg}</div>`;
-        input.value = '';
-        
-        try {
-            const result = await callAPI('chat', { message: msg });
-            if (result.success) {
-                messages.innerHTML += `<div>🤖 ImanAI: ${result.response}</div>`;
-                document.getElementById('creditsDisplay').innerHTML = result.remaining_credits;
-            } else {
-                messages.innerHTML += `<div>❌ ${result.error}</div>`;
-            }
-        } catch(e) {
-            messages.innerHTML += `<div>❌ خطا: ${e.message}</div>`;
-        }
-        messages.scrollTop = messages.scrollHeight;
-    }
-    
-    async function loadDashboard() {
-        if (!currentApiKey) return;
-        try {
-            const result = await callAPI('balance', {});
-            if (result.success) {
-                document.getElementById('creditsDisplay').innerHTML = result.credits;
-                document.getElementById('apiKeyDisplay').innerHTML = currentApiKey;
-            }
-        } catch(e) {
-            console.error(e);
-        }
-    }
-    
-    function logout() {
-        localStorage.removeItem('imanai_api_key');
-        location.reload();
-    }
-    
-    function copyApiKey() {
-        navigator.clipboard.writeText(currentApiKey);
-        alert('✅ کپی شد!');
-    }
-    
-    function updateUI() {
-        if (currentApiKey) {
-            document.getElementById('registerBox').style.display = 'none';
-            document.getElementById('dashboardBox').style.display = 'block';
-            loadDashboard();
-        } else {
-            document.getElementById('registerBox').style.display = 'block';
-            document.getElementById('dashboardBox').style.display = 'none';
-        }
-    }
-    
-    updateUI();
-</script>
+<script src="imanai-client.js"></script>
 </body>
 </html>
